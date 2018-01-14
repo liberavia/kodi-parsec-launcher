@@ -1,10 +1,11 @@
 #!/bin/bash
-echo Angekommen mit Parametern `echo $@`
-openbox &
+echo "Angekommen mit Parametern `echo $@`" >> /home/osmc/parsec_start.log
+# openbox &
 scc-daemon stop
 # profile needs to be 3rd param
 scc-daemon /home/osmc/.config/scc/profiles/Dragon\ Age\ Inquisition.sccprofile start
 # never save auth data to always expect the same flow when calling parsec
 rm /home/osmc/.parsec/auth
 # execute expect script and pass params
+echo "execute expect script and pass params `echo $@`" >> /home/osmc/parsec_start.log
 /home/osmc/Scripts/parsec-start/expect_parsec `echo $@`
