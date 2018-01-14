@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <setting id="parsec_user"		type="text" label="30001"/>
+    <setting id="parsec_passwd"		type="text" label="30002" option="hidden"/>
+</settings>

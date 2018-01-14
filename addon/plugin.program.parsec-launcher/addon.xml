@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.program.parsec-launcher" name="Parsec" version="0.0.1" provider-name="liberavia">
+    <requires>
+        <import addon="xbmc.python" version="2.1.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>executable</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <language/>
+        <platform>linux</platform>
+        <disclaimer>For Kodi linux (tested on OSMC final)</disclaimer>
+        <summary lang="en">Launch and Manage Parsec from Kodi.</summary>
+        <description lang="en">Addon enables to manage and launch to Parsec Cloud Gaming computers.</description>
+        <website>https://github.com/liberavia/kodi-parsec</website>
+        <email>andre.gregor.herrmann@gmail.com</email>
+    </extension>
+</addon>
