@@ -558,7 +558,7 @@ def find_single_match(text,pattern):
 
     return result
 
-def add_item( action="" , title="" , plot="" , url="" , thumbnail="" , fanart="" , show="" , episode="" , extra="", page="", info_labels = None, isPlayable = False , folder=True, quality="", imdb_rating="", comments="", movie_language="", genre="", actorsandmore="", landyear="", age_recomm="" ):
+def add_item( action="" , title="" , plot="" , url="" , thumbnail="" , fanart="" , show="" , episode="" , extra="", page="", info_labels = None, isPlayable = False , folder=True, quality="", imdb_rating="", comments="", movie_language="", genre="", actorsandmore="", landyear="", age_recomm="", session_id="" ):
     _log("add_item action=["+action+"] title=["+title+"] url=["+url+"] thumbnail=["+thumbnail+"] fanart=["+fanart+"] show=["+show+"] episode=["+episode+"] extra=["+extra+"] page=["+page+"] isPlayable=["+str(isPlayable)+"] folder=["+str(folder)+"]")
 
     listitem = xbmcgui.ListItem( title, iconImage="DefaultVideo.png", thumbnailImage=thumbnail )
@@ -577,10 +577,10 @@ def add_item( action="" , title="" , plot="" , url="" , thumbnail="" , fanart=""
     elif isPlayable:
         listitem.setProperty("Video", "true")
         listitem.setProperty('IsPlayable', 'true')
-        itemurl = '%s?action=%s&title=%s&url=%s&thumbnail=%s&plot=%s&extra=%s&page=%s&quality=%s&imdb_rating=%s&comments=%s&movie_language=%s&genre=%s&actorsandmore=%s&landyear=%s&age_recomm=%s' % ( sys.argv[ 0 ] , action , urllib.quote_plus( title ) , urllib.quote_plus(url) , urllib.quote_plus( thumbnail ) , urllib.quote_plus( plot ) , urllib.quote_plus( extra ) , urllib.quote_plus( page ), urllib.quote_plus( quality ), urllib.quote_plus( imdb_rating ), urllib.quote_plus( comments ), urllib.quote_plus( movie_language ), urllib.quote_plus( genre ), urllib.quote_plus( actorsandmore ), urllib.quote_plus( landyear ), urllib.quote_plus( age_recomm ) )
+        itemurl = '%s?action=%s&title=%s&url=%s&thumbnail=%s&plot=%s&extra=%s&page=%s&quality=%s&imdb_rating=%s&comments=%s&movie_language=%s&genre=%s&actorsandmore=%s&landyear=%s&age_recomm=%s&session_id=%s' % ( sys.argv[ 0 ] , action , urllib.quote_plus( title ) , urllib.quote_plus(url) , urllib.quote_plus( thumbnail ) , urllib.quote_plus( plot ) , urllib.quote_plus( extra ) , urllib.quote_plus( page ), urllib.quote_plus( quality ), urllib.quote_plus( imdb_rating ), urllib.quote_plus( comments ), urllib.quote_plus( movie_language ), urllib.quote_plus( genre ), urllib.quote_plus( actorsandmore ), urllib.quote_plus( landyear ), urllib.quote_plus( age_recomm ), urllib.quote_plus( session_id ) )
         xbmcplugin.addDirectoryItem( handle=int(sys.argv[1]), url=itemurl, listitem=listitem, isFolder=folder)
     else:
-        itemurl = '%s?action=%s&title=%s&url=%s&thumbnail=%s&plot=%s&extra=%s&page=%s&quality=%s&imdb_rating=%s&comments=%s&movie_language=%s&genre=%s&actorsandmore=%s&landyear=%s&age_recomm=%s' % ( sys.argv[ 0 ] , action , urllib.quote_plus( title ) , urllib.quote_plus(url) , urllib.quote_plus( thumbnail ) , urllib.quote_plus( plot ) , urllib.quote_plus( extra ) , urllib.quote_plus( page ), urllib.quote_plus( quality ), urllib.quote_plus( imdb_rating ), urllib.quote_plus( comments ), urllib.quote_plus( movie_language ), urllib.quote_plus( genre ), urllib.quote_plus( actorsandmore ), urllib.quote_plus( landyear ), urllib.quote_plus( age_recomm ) )
+        itemurl = '%s?action=%s&title=%s&url=%s&thumbnail=%s&plot=%s&extra=%s&page=%s&quality=%s&imdb_rating=%s&comments=%s&movie_language=%s&genre=%s&actorsandmore=%s&landyear=%s&age_recomm=%s&session_id=%s' % ( sys.argv[ 0 ] , action , urllib.quote_plus( title ) , urllib.quote_plus(url) , urllib.quote_plus( thumbnail ) , urllib.quote_plus( plot ) , urllib.quote_plus( extra ) , urllib.quote_plus( page ), urllib.quote_plus( quality ), urllib.quote_plus( imdb_rating ), urllib.quote_plus( comments ), urllib.quote_plus( movie_language ), urllib.quote_plus( genre ), urllib.quote_plus( actorsandmore ), urllib.quote_plus( landyear ), urllib.quote_plus( age_recomm ), urllib.quote_plus( session_id ))
         xbmcplugin.addDirectoryItem( handle=int(sys.argv[1]), url=itemurl, listitem=listitem, isFolder=folder)
 
 def close_item_list():

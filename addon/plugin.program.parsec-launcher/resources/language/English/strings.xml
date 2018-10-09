@@ -10,4 +10,14 @@
     
     <!-- Main strings -->
     <string id="30020">Launch Parsec</string>
+    <string id="30021">Manage computers</string>
+    <string id="30022">Manage: </string>
+    <string id="30023">Switch computer: ON</string>
+    <string id="30024">Switch computer: OFF</string>
+    <string id="30025">Computer busy...</string>
+
+    <!-- Message strings -->
+    <string id="30200">This computer is busy</string>
+    <string id="30201">Computer will start up. Please wait...</string>
+    <string id="30201">Computer will be switched off.</string>
 </strings>
