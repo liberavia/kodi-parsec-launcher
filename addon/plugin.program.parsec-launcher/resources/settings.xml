@@ -2,4 +2,5 @@
 <settings>
     <setting id="parsec_user"		type="text" label="30001"/>
     <setting id="parsec_passwd"		type="text" label="30002" option="hidden"/>
+    <setting id="parsec_debugmode"  type="bool" label="30003" default="false"/>
 </settings>

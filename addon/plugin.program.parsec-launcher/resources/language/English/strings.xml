@@ -9,15 +9,24 @@
     <string id="30002">Parsec Password</string>
     
     <!-- Main strings -->
-    <string id="30020">Launch Parsec</string>
+    <string id="30020">Connect to computer</string>
     <string id="30021">Manage computers</string>
     <string id="30022">Manage: </string>
     <string id="30023">Switch computer: ON</string>
     <string id="30024">Switch computer: OFF</string>
-    <string id="30025">Computer busy...</string>
+    <string id="30025">Computer is busy...</string>
+    <string id="30026">Parsec</string>
+    <string id="30027">Status</string>
+    <string id="30028">Created</string>
+    <string id="30029">Last updated</string>
+    <string id="30030">Provider</string>
+    <string id="30031">Machine type</string>
+    <string id="30032">Region</string>
+    <string id="30033">Credit</string>
+    <string id="30034">Playtime</string>
 
     <!-- Message strings -->
     <string id="30200">This computer is busy</string>
-    <string id="30201">Computer will start up. Please wait...</string>
-    <string id="30201">Computer will be switched off.</string>
+    <string id="30201">Starting up</string>
+    <string id="30201">Switching off</string>
 </strings>

@@ -9,15 +9,24 @@
     <string id="30002">Parsec Passwort</string>
     
     <!-- Main strings -->
-    <string id="30020">Starte Parsec</string>
+    <string id="30020">Mit Computer verbinden</string>
     <string id="30021">Computer verwalten</string>
     <string id="30022">Verwalte: </string>
     <string id="30023">Computer einschalten</string>
     <string id="30024">Computer ausschalten</string>
     <string id="30025">Computer beschäftigt...</string>
+    <string id="30026">Parsec</string>
+    <string id="30027">Status</string>
+    <string id="30028">Erstellt</string>
+    <string id="30029">Letztes Update</string>
+    <string id="30030">Anbieter</string>
+    <string id="30031">Computertyp</string>
+    <string id="30032">Region</string>
+    <string id="30033">Guthaben</string>
+    <string id="30034">Spielzeit</string>
 
     <!-- Message strings -->
     <string id="30200">Der Computer ist beschäftigt</string>
-    <string id="30201">Computer wird eingeschaltet. Bitte warten...</string>
-    <string id="30201">Computer wird ausgeschaltet.</string>
+    <string id="30201">Wird eingeschaltet</string>
+    <string id="30201">Wird ausgeschaltet</string>
 </strings>
