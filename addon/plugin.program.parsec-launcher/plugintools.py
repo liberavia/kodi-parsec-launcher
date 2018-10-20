@@ -53,7 +53,7 @@ from StringIO import StringIO
 import gzip
 import pprint
 import base64
-
+import json
 
 module_log_enabled = False
 http_debug_log_enabled = False
@@ -558,7 +558,7 @@ def find_single_match(text,pattern):
 
     return result
 
-def add_item( action="" , title="" , plot="" , url="" , thumbnail="" , fanart="" , show="" , episode="" , extra="", page="", info_labels = None, isPlayable = False , folder=True, quality="", imdb_rating="", comments="", movie_language="", genre="", actorsandmore="", landyear="", age_recomm="" ):
+def add_item( action="" , title="" , plot="" , url="" , thumbnail="" , fanart="" , show="" , episode="" , extra="", page="", info_labels = None, isPlayable = False , folder=True, quality="", imdb_rating="", comments="", movie_language="", genre="", actorsandmore="", landyear="", age_recomm="", session_id="" ):
     _log("add_item action=["+action+"] title=["+title+"] url=["+url+"] thumbnail=["+thumbnail+"] fanart=["+fanart+"] show=["+show+"] episode=["+episode+"] extra=["+extra+"] page=["+page+"] isPlayable=["+str(isPlayable)+"] folder=["+str(folder)+"]")
 
     listitem = xbmcgui.ListItem( title, iconImage="DefaultVideo.png", thumbnailImage=thumbnail )
@@ -577,16 +577,98 @@ def add_item( action="" , title="" , plot="" , url="" , thumbnail="" , fanart=""
     elif isPlayable:
         listitem.setProperty("Video", "true")
         listitem.setProperty('IsPlayable', 'true')
-        itemurl = '%s?action=%s&title=%s&url=%s&thumbnail=%s&plot=%s&extra=%s&page=%s&quality=%s&imdb_rating=%s&comments=%s&movie_language=%s&genre=%s&actorsandmore=%s&landyear=%s&age_recomm=%s' % ( sys.argv[ 0 ] , action , urllib.quote_plus( title ) , urllib.quote_plus(url) , urllib.quote_plus( thumbnail ) , urllib.quote_plus( plot ) , urllib.quote_plus( extra ) , urllib.quote_plus( page ), urllib.quote_plus( quality ), urllib.quote_plus( imdb_rating ), urllib.quote_plus( comments ), urllib.quote_plus( movie_language ), urllib.quote_plus( genre ), urllib.quote_plus( actorsandmore ), urllib.quote_plus( landyear ), urllib.quote_plus( age_recomm ) )
+        itemurl = '%s?action=%s&title=%s&url=%s&thumbnail=%s&plot=%s&extra=%s&page=%s&quality=%s&imdb_rating=%s&comments=%s&movie_language=%s&genre=%s&actorsandmore=%s&landyear=%s&age_recomm=%s&session_id=%s' % ( sys.argv[ 0 ] , action , urllib.quote_plus( title ) , urllib.quote_plus(url) , urllib.quote_plus( thumbnail ) , urllib.quote_plus( plot ) , urllib.quote_plus( extra ) , urllib.quote_plus( page ), urllib.quote_plus( quality ), urllib.quote_plus( imdb_rating ), urllib.quote_plus( comments ), urllib.quote_plus( movie_language ), urllib.quote_plus( genre ), urllib.quote_plus( actorsandmore ), urllib.quote_plus( landyear ), urllib.quote_plus( age_recomm ), urllib.quote_plus( session_id ) )
         xbmcplugin.addDirectoryItem( handle=int(sys.argv[1]), url=itemurl, listitem=listitem, isFolder=folder)
     else:
-        itemurl = '%s?action=%s&title=%s&url=%s&thumbnail=%s&plot=%s&extra=%s&page=%s&quality=%s&imdb_rating=%s&comments=%s&movie_language=%s&genre=%s&actorsandmore=%s&landyear=%s&age_recomm=%s' % ( sys.argv[ 0 ] , action , urllib.quote_plus( title ) , urllib.quote_plus(url) , urllib.quote_plus( thumbnail ) , urllib.quote_plus( plot ) , urllib.quote_plus( extra ) , urllib.quote_plus( page ), urllib.quote_plus( quality ), urllib.quote_plus( imdb_rating ), urllib.quote_plus( comments ), urllib.quote_plus( movie_language ), urllib.quote_plus( genre ), urllib.quote_plus( actorsandmore ), urllib.quote_plus( landyear ), urllib.quote_plus( age_recomm ) )
+        itemurl = '%s?action=%s&title=%s&url=%s&thumbnail=%s&plot=%s&extra=%s&page=%s&quality=%s&imdb_rating=%s&comments=%s&movie_language=%s&genre=%s&actorsandmore=%s&landyear=%s&age_recomm=%s&session_id=%s' % ( sys.argv[ 0 ] , action , urllib.quote_plus( title ) , urllib.quote_plus(url) , urllib.quote_plus( thumbnail ) , urllib.quote_plus( plot ) , urllib.quote_plus( extra ) , urllib.quote_plus( page ), urllib.quote_plus( quality ), urllib.quote_plus( imdb_rating ), urllib.quote_plus( comments ), urllib.quote_plus( movie_language ), urllib.quote_plus( genre ), urllib.quote_plus( actorsandmore ), urllib.quote_plus( landyear ), urllib.quote_plus( age_recomm ), urllib.quote_plus( session_id ))
         xbmcplugin.addDirectoryItem( handle=int(sys.argv[1]), url=itemurl, listitem=listitem, isFolder=folder)
+
+
+def add_computer_list_item(action="", title="", thumbnail="", fanart="", session_id="", numberselect="", computer=None, user=None, info_labels=None, folder=True, context=False):
+    listitem = xbmcgui.ListItem(title, iconImage="DefaultVideo.png", thumbnailImage=thumbnail)
+
+    if info_labels is None:
+        info_labels = {"Title": title, "Plot": get_computer_info(computer, user)}
+
+    listitem.setInfo("video", info_labels)
+
+    if fanart != "":
+        listitem.setProperty('fanart_image', fanart)
+        xbmcplugin.setPluginFanart(int(sys.argv[1]), fanart)
+
+    if context:
+        context_entries = []
+
+        for context_entry in context:
+            context_label = context_entry.get('label')
+            context_url = context_entry.get('url')
+            runner = "XBMC.RunPlugin(" + str(context_url) + ", "")"
+            context_entries.append((str(context_label), runner,))
+
+        listitem.addContextMenuItems(context_entries)
+
+    itemurl = '%s?action=%s&title=%s&session_id=%s&computer=%s&user=%s&thumbnail=%s&fanart=%s&numberselect=%s' % (
+        sys.argv[0],
+        action,
+        urllib.quote_plus(title),
+        urllib.quote_plus(session_id),
+        urllib.quote_plus(computer),
+        urllib.quote_plus(user),
+        urllib.quote_plus(thumbnail),
+        urllib.quote_plus(fanart),
+        numberselect,
+    )
+    xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=itemurl, listitem=listitem, isFolder=folder)
+
+
+def get_computer_info(computer_json, user_json):
+    computer = json.loads(computer_json)
+    user = json.loads(user_json)
+    addon=__settings__
+
+    LANG_TITLE_STATUS = addon.getLocalizedString(30027).encode('utf-8')
+    LANG_TITLE_CREATED = addon.getLocalizedString(30028).encode('utf-8')
+    LANG_TITLE_LAST_UPDATED = addon.getLocalizedString(30029).encode('utf-8')
+    LANG_TITLE_PROVIDER = addon.getLocalizedString(30030).encode('utf-8')
+    LANG_TITLE_MACHINE_TYPE = addon.getLocalizedString(30031).encode('utf-8')
+    LANG_TITLE_REGION = addon.getLocalizedString(30032).encode('utf-8')
+    LANG_TITLE_CREDIT = addon.getLocalizedString(30033).encode('utf-8')
+    LANG_TITLE_PLAYTIME = addon.getLocalizedString(30034).encode('utf-8')
+    LANG_TITLE_HOURS = addon.getLocalizedString(30035).encode('utf-8')
+    LANG_TITLE_DOLLAR = addon.getLocalizedString(30036).encode('utf-8')
+    LANG_TITLE_COMPUTER_INFO = addon.getLocalizedString(30037).encode('utf-8')
+    LANG_TITLE_USER_INFO = addon.getLocalizedString(30038).encode('utf-8')
+    LANG_TITLE_USERNAME = addon.getLocalizedString(30039).encode('utf-8')
+
+    credits_dollar = float(float(user['credits'])/100)
+    credits_dollar = str(credits_dollar)
+    credits_dollar = LANG_TITLE_DOLLAR + credits_dollar
+    play_time = str(user['play_time']/60/60) + " " +  LANG_TITLE_HOURS
+
+    # building string
+    computer_info = ""
+    computer_info += LANG_TITLE_COMPUTER_INFO
+    computer_info += "\n"
+    computer_info += LANG_TITLE_STATUS + ": " + computer['status'] + "\n"
+    computer_info += LANG_TITLE_CREATED + ": " + computer['created_at'] + "\n"
+    computer_info += LANG_TITLE_LAST_UPDATED + ": " + computer['updated_at'] + "\n"
+    computer_info += LANG_TITLE_PROVIDER + ": " + computer['managed']['provider_name'] + "\n"
+    computer_info += LANG_TITLE_MACHINE_TYPE + ": " + computer['managed']['machine_type'] + "\n"
+    computer_info += LANG_TITLE_REGION + ": " + computer['managed']['region'] + "\n"
+    computer_info += LANG_TITLE_USER_INFO
+    computer_info += "\n"
+    computer_info += LANG_TITLE_USERNAME + ": " + user['name'] + "\n"
+    computer_info += LANG_TITLE_CREDIT + ": " + credits_dollar + "\n"
+    computer_info += LANG_TITLE_PLAYTIME + ": " + play_time + "\n"
+
+    return computer_info
+
 
 def close_item_list():
     _log("close_item_list")
 
     xbmcplugin.endOfDirectory(handle=int(sys.argv[1]), succeeded=True)
+
 
 def play_resolved_url(url):
     _log("play_resolved_url ["+url+"]")
@@ -594,6 +676,7 @@ def play_resolved_url(url):
     listitem = xbmcgui.ListItem(path=url)
     listitem.setProperty('IsPlayable', 'true')
     return xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
+
 
 def direct_play(url):
     _log("direct_play ["+url+"]")

@@ -1,0 +1,9 @@
+#!/bin/bash
+openbox &
+# scc-daemon stop
+# profile needs to be 3rd param
+# scc-daemon /home/osmc/.config/scc/profiles/Desktop.sccprofile start
+# never save auth data to always expect the same flow when calling parsec
+rm `$HOME`/.parsec/auth
+# execute expect script and pass params
+`$HOME`/Scripts/parsec-start/expect_parsec `echo $@`
