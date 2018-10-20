@@ -72,6 +72,8 @@ LANG_TITLE_USERNAME = addon.getLocalizedString(30039).encode('utf-8')
 LANG_MESSAGE_NO_CREDENTIALS=addon.getLocalizedString(30040).encode('utf-8')
 LANG_QUESTION_TO_SETTINGS=addon.getLocalizedString(30041).encode('utf-8')
 LANG_MESSAGE_WRONG_CREDENTIALS=addon.getLocalizedString(30042).encode('utf-8')
+LANG_MESSAGE_COMPUTER_OFF=addon.getLocalizedString(30043).encode('utf-8')
+LANG_QUESTION_QUESTION_SWITCH_ON=addon.getLocalizedString(30044).encode('utf-8')
 
 LANG_TITLE_MANAGE_COMPUTER_MESSAGE_PENDING=addon.getLocalizedString(30200).encode('utf-8')
 LANG_TITLE_MANAGE_COMPUTER_MESSAGE_ON=addon.getLocalizedString(30201).encode('utf-8')
@@ -247,11 +249,24 @@ def connect_to_computer(params):
     current_computer = json.loads(computer_json)
     numberselect = params.get('numberselect')
 
-    instance_running = get_is_instance_running()
+    instance_running = get_is_instance_running(current_computer)
+    instance_off = get_is_instance_off(current_computer)
 
     if instance_running:
         full_command = "/home/osmc/Scripts/parsec-start/xstart.sh " + parsec_user + " " + parsec_passwd + " " + numberselect
         os.popen(full_command)
+    elif instance_off:
+        answer = xbmcgui.Dialog().yesno(
+            LANG_PARSEC,
+            LANG_MESSAGE_COMPUTER_OFF,
+            LANG_QUESTION_QUESTION_SWITCH_ON
+        )
+        if answer == True:
+            switch_computer_on(params)
+            redirect_to_beginning()
+    else:
+        xbmcgui.Dialog().ok(LANG_PARSEC, LANG_TITLE_MANAGE_COMPUTER_MESSAGE_PENDING)
+        redirect_to_beginning()
     pass
 
 
@@ -518,10 +533,27 @@ def switch_computer_state(target_state, computer_id):
     urllib2.urlopen(req)
 
 
-def get_is_instance_running():
-    session_id = get_parsec_session_id()
+def get_is_instance_running(computer):
+    """
+    Checks state of given computer is on
+    :param computer:
+    :return:
+    """
+    if computer['status'] == 'on':
+        return True
+    return False
 
-    return True
+
+def get_is_instance_off(computer):
+    """
+    Checks state of given computer is off
+    :param computer:
+    :return:
+    """
+    if computer['status'] == 'off':
+        return True
+    return False
+
 
 
 def trigger_notification(message, time=5000):
