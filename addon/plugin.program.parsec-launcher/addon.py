@@ -15,6 +15,8 @@ import xbmcgui
 import xbmcaddon
 import plugintools
 import pprint
+import time
+import threading
 
 # plugin constants
 __plugin__ = "Parsec"
@@ -23,13 +25,14 @@ __url__ = "https://github.com/liberavia/kodi-parsec"
 __git_url__ = "https://github.com/liberavia/kodi-parsec"
 __version__ = "0.1.0"
 
+# Constants
+MAX_BACKGROUND_REPEATS=30 # which is 5 min waiting
 API_BASEURL = "https://parsecgaming.com/v1/"
 API_AUTHURL = API_BASEURL + "auth"
 API_LIST_COMPUTERS = API_BASEURL + "server-list?include_managed=true"
 API_USER_INFO = API_BASEURL + "me"
 API_SWITCH_COMPUTER_ON = API_BASEURL + "activate-lease"
 API_SWITCH_COMPUTER_OFF = API_BASEURL + "deactivate-lease"
-
 ADDON_BASE_PATH = os.path.dirname(__file__)
 ADDON_SCRIPT_PATH = os.path.join(ADDON_BASE_PATH, 'scripts')
 THUMBNAIL_PATH = os.path.join(plugintools.get_runtime_path(), "resources", "img")
@@ -40,6 +43,7 @@ LOGO_SERVER_OFF = DEFAULT_LOGO
 LOGO_SERVER_PENDING = DEFAULT_LOGO
 LOGO_SERVER_CONNECT = DEFAULT_LOGO
 
+# Globals
 parsec_session_id = False
 current_computer = False
 dialog = xbmcgui.Dialog()
@@ -47,8 +51,9 @@ addon = xbmcaddon.Addon(id='plugin.program.parsec-launcher')
 user_agent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:62.0) Gecko/20100101 Firefox/62.0'
 parsec_user = ""
 parsec_passwd = ""
+background_repeats = 0
 
-# MAIN MENU
+# Language strings
 LANG_TITLE_CONNECT_PARSEC=addon.getLocalizedString(30020).encode('utf-8')
 LANG_TITLE_MANAGE_COMPUTERS=addon.getLocalizedString(30021).encode('utf-8')
 LANG_TITLE_MANAGE=addon.getLocalizedString(30022).encode('utf-8')
@@ -74,6 +79,8 @@ LANG_QUESTION_TO_SETTINGS=addon.getLocalizedString(30041).encode('utf-8')
 LANG_MESSAGE_WRONG_CREDENTIALS=addon.getLocalizedString(30042).encode('utf-8')
 LANG_MESSAGE_COMPUTER_OFF=addon.getLocalizedString(30043).encode('utf-8')
 LANG_QUESTION_QUESTION_SWITCH_ON=addon.getLocalizedString(30044).encode('utf-8')
+LANG_MESSAGE_COMPUTER_ON=addon.getLocalizedString(30045).encode('utf-8')
+LANG_MESSAGE_BACKGROUND_TASK_BREAK=addon.getLocalizedString(30046).encode('utf-8')
 
 LANG_TITLE_MANAGE_COMPUTER_MESSAGE_PENDING=addon.getLocalizedString(30200).encode('utf-8')
 LANG_TITLE_MANAGE_COMPUTER_MESSAGE_ON=addon.getLocalizedString(30201).encode('utf-8')
@@ -170,7 +177,14 @@ def user_credentials_available():
             redirect_to_beginning()
         return False
 
+
 def check_credentials():
+    """
+    Checks if configured credentials are working. If not
+    trigger questioning user for reconfiguration
+
+    :return:
+    """
     try:
         get_parsec_session_id()
     except:
@@ -182,7 +196,6 @@ def check_credentials():
         if answer == True:
             plugintools.open_settings_dialog()
             redirect_to_beginning()
-
 
 
 def get_computer_context_menu(computer, numberselect):
@@ -391,7 +404,12 @@ def get_computer_title():
 
 
 def get_computer_status_logo():
-    # Return matching title to current state
+    """
+    Returns matching logo to current computer status
+
+    :return:
+    """
+
     global current_computer
     computer = current_computer
 
@@ -406,10 +424,14 @@ def get_computer_status_logo():
 
 
 def get_target_state_action():
+    """
+    Returns action method string matching to target
+
+    :return:
+    """
     global current_computer
     computer = current_computer
 
-    # Returns action method string to be target
     target_state_action = 'switch_computer'
     if computer['status'] == 'off':
         target_state_action += '_on'
@@ -421,23 +443,14 @@ def get_target_state_action():
     return target_state_action
 
 
-def get_target_state_script():
-    global current_computer
-    computer = current_computer
-
-    # Returns action method string to be target
-    if computer['status'] == 'off':
-        target_state_script = 'computer_start.py'
-    elif computer['status'] == 'on':
-        target_state_script = 'computer_stop.py'
-    else:
-        target_state_script += 'notify_pending.py'
-
-    return target_state_script
-
-
 def get_target_title():
-    # Return matching title to current state
+    """
+    Return target state label text matching to current
+    computer status
+
+    :return:
+    """
+
     global current_computer
     computer = current_computer
 
@@ -452,7 +465,12 @@ def get_target_title():
 
 
 def get_computers():
-    # Returns list of available computers and their metadata
+    """
+    Returns list of available computers and their metadata
+
+    :return:
+    """
+
     session_id = get_parsec_session_id()
     plugintools.log("Received parsec sessionid for getting list of computers:" + session_id)
     computers = get_parsec_request_result(session_id, API_LIST_COMPUTERS)
@@ -461,7 +479,12 @@ def get_computers():
 
 
 def get_user_info():
-    # Returns list of user information
+    """
+    Returns infos of logged in parsec user
+
+    :return:
+    """
+
     session_id = get_parsec_session_id()
     plugintools.log("Received parsec sessionid for fetching user:" + session_id)
     user = get_parsec_request_result(session_id, API_USER_INFO)
@@ -469,13 +492,13 @@ def get_user_info():
 
 
 def get_parsec_request_result(session_id, url):
-    '''
+    """
     requesting parsec by providing session and url
 
     :param session_id:
     :param url:
     :return list:
-    '''
+    """
 
     values = {}
     header = {
@@ -490,7 +513,11 @@ def get_parsec_request_result(session_id, url):
 
 
 def get_parsec_session_id():
-    # fetches current session id or creates it
+    """
+    Central method for generating/offering parsec session id
+
+    :return:
+    """
     global parsec_session_id
 
     if parsec_session_id == False:
@@ -514,6 +541,14 @@ def get_parsec_session_id():
 
 
 def switch_computer_state(target_state, computer_id):
+    """
+    Switch state of given computer to target state (on/off)
+
+    :param target_state:
+    :param computer_id:
+    :return:
+    """
+
     if target_state == 'on':
         url = API_SWITCH_COMPUTER_ON
     else:
@@ -531,14 +566,93 @@ def switch_computer_state(target_state, computer_id):
 
     req = urllib2.Request(url, data, headers)
     urllib2.urlopen(req)
+    background_target_state_create(target_state, computer_id)
+
+
+def background_target_state_create(target_state, computer_id):
+    """
+    Creates background instance for placing a thread to check until
+    target state has been reached
+
+    :param target_state:
+    :param computer_id:
+    :return:
+    """
+
+    global background_repeats
+
+    background_repeats = 0
+
+    if target_state == 'on':
+        LANG_ACTION = LANG_TITLE_MANAGE_COMPUTER_MESSAGE_ON
+    else:
+        LANG_ACTION = LANG_TITLE_MANAGE_COMPUTER_MESSAGE_OFF
+
+    background_dialog = xbmcgui.DialogProgressBG()
+    background_dialog.create(LANG_PARSEC, LANG_ACTION)
+    background_dialog.update(50, LANG_PARSEC, LANG_ACTION)
+    background_process = threading.Thread(target=background_target_state_update, args=(target_state, computer_id, background_dialog,))
+    background_process.start()
+    pass
+
+
+def background_target_state_update(target_state, computer_id, background_dialog):
+    """
+    Polling given instance until target_stage has been reached
+
+    :param target_state:
+    :param computer_id:
+    :param background_dialog:
+    :return:
+    """
+
+    if target_state == 'on':
+        LANG_ACTION_DONE = LANG_MESSAGE_COMPUTER_ON
+    else:
+        LANG_ACTION_DONE = LANG_MESSAGE_COMPUTER_OFF
+
+    computers = get_computers()
+
+    for computer in computers:
+        task_done = background_target_reached(computer, target_state, computer_id)
+        if task_done:
+            background_dialog.update(100, LANG_PARSEC, LANG_ACTION_DONE)
+            trigger_notification(LANG_ACTION_DONE)
+            background_dialog.close()
+            xbmc.executebuiltin('Container.Update')
+            return
+
+    time.sleep(10)
+    background_target_state_update(target_state, computer_id, background_dialog)
+    pass
+
+
+def background_target_reached(computer, target_state, target_id):
+    """
+    checks if computer instance matches with target_state and target_id
+
+    :param computer:
+    :param target_state:
+    :param target_id:
+    :return:
+    """
+
+    if computer['status'] == target_state and computer['lease'] == target_id:
+        return True
+    if background_repeats >= MAX_BACKGROUND_REPEATS:
+        trigger_notification(LANG_MESSAGE_BACKGROUND_TASK_BREAK)
+        return True
+    return False
 
 
 def get_is_instance_running(computer):
     """
     Checks state of given computer is on
+
     :param computer:
     :return:
     """
+
     if computer['status'] == 'on':
         return True
     return False
@@ -550,10 +664,10 @@ def get_is_instance_off(computer):
     :param computer:
     :return:
     """
+
     if computer['status'] == 'off':
         return True
     return False
-
 
 
 def trigger_notification(message, time=5000):
@@ -571,5 +685,5 @@ def trigger_notification(message, time=5000):
     xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (__addonname__, message, time, __icon__))
     pass
 
-
+# script starts from the end ;-)
 run()
