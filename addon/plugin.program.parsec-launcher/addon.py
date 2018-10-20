@@ -236,6 +236,11 @@ def connect_to_computer(params):
     """
     global current_computer
     global parsec_session_id
+    global parsec_user
+    global parsec_passwd
+
+    parsec_user = plugintools.get_setting("parsec_user")
+    parsec_passwd = plugintools.get_setting("parsec_passwd")
 
     computer_json = params.get('computer')
     parsec_session_id = params.get('session_id')
