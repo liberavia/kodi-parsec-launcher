@@ -1,0 +1,17 @@
+#!/usr/bin/expect -f
+set timeout -1
+
+set user [lindex $argv 0]
+set passwd [lindex $argv 1]
+set numberselect [lindex $argv 2]
+
+spawn parsecd
+expect "Email address:"
+send "$user\r"
+expect "Password:"
+send "$passwd\r"
+expect "Save password? (y/n):"
+send "n\r"
+expect "Select server:"
+send "$numberselect\r"
+expect eof

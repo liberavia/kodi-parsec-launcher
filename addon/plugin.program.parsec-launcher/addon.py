@@ -45,6 +45,8 @@ current_computer = False
 dialog = xbmcgui.Dialog()
 addon = xbmcaddon.Addon(id='plugin.program.parsec-launcher')
 user_agent = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:62.0) Gecko/20100101 Firefox/62.0'
+parsec_user = ""
+parsec_passwd = ""
 
 # MAIN MENU
 LANG_TITLE_CONNECT_PARSEC=addon.getLocalizedString(30020).encode('utf-8')
@@ -62,23 +64,26 @@ LANG_TITLE_MACHINE_TYPE=addon.getLocalizedString(30031).encode('utf-8')
 LANG_TITLE_REGION=addon.getLocalizedString(30032).encode('utf-8')
 LANG_TITLE_CREDIT=addon.getLocalizedString(30033).encode('utf-8')
 LANG_TITLE_PLAYTIME=addon.getLocalizedString(30034).encode('utf-8')
-
+LANG_TITLE_HOURS = addon.getLocalizedString(30035).encode('utf-8')
+LANG_TITLE_DOLLAR = addon.getLocalizedString(30036).encode('utf-8')
+LANG_TITLE_COMPUTER_INFO = addon.getLocalizedString(30037).encode('utf-8')
+LANG_TITLE_USER_INFO = addon.getLocalizedString(30038).encode('utf-8')
+LANG_TITLE_USERNAME = addon.getLocalizedString(30039).encode('utf-8')
+LANG_MESSAGE_NO_CREDENTIALS=addon.getLocalizedString(30040).encode('utf-8')
+LANG_QUESTION_TO_SETTINGS=addon.getLocalizedString(30041).encode('utf-8')
+LANG_MESSAGE_WRONG_CREDENTIALS=addon.getLocalizedString(30042).encode('utf-8')
 
 LANG_TITLE_MANAGE_COMPUTER_MESSAGE_PENDING=addon.getLocalizedString(30200).encode('utf-8')
 LANG_TITLE_MANAGE_COMPUTER_MESSAGE_ON=addon.getLocalizedString(30201).encode('utf-8')
 LANG_TITLE_MANAGE_COMPUTER_MESSAGE_OFF=addon.getLocalizedString(30202).encode('utf-8')
 
 
-def trigger_notification(message, time=5000):
-    # Trigger notification with given message for given time in milliseconds
-    __addonname__ = addon.getAddonInfo('name')
-    __icon__ = addon.getAddonInfo('icon')
-
-    xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (__addonname__, message, time, __icon__))
-
-
-# Entry point
 def run():
+    """
+    Entry point of addon
+
+    :return:
+    """
     plugintools.log("kodi-parsec.run")
 
     # Get params
@@ -90,15 +95,23 @@ def run():
         action = params.get("action")
         exec action+"(params)"
     plugintools.close_item_list()
+    pass
 
 
 def main_list(params):
-    # Main menu
-    # List of available computers
+    """
+    Main menu
+    List of available computers
+
+    :param params:
+    :return:
+    """
+
     global current_computer
     global parsec_session_id
 
-    plugintools.set_view(plugintools.LIST)
+    user_credentials_available()
+    check_credentials()
 
     computers = get_computers()
     user = get_user_info()
@@ -110,19 +123,64 @@ def main_list(params):
         context=get_computer_context_menu(computer, numberselect)
         plugintools.log("parsec computer title is " + computer_title)
         computer_status_logo = get_computer_status_logo()
+        user_json = json.dumps(user)
+        plugintools.log("user json is : " + user_json)
 
         plugintools.add_computer_list_item(
             action="manage_computer",
             title=computer_title,
             session_id=parsec_session_id,
             computer=json.dumps(current_computer),
-            user=json.dumps(user),
+            user=user_json,
             numberselect=numberselect,
             thumbnail=computer_status_logo,
             fanart=DEFAULT_FANART,
             folder=True,
             context=context
         )
+    pass
+
+
+def user_credentials_available():
+    """
+    Checking if user credentials are set and asking for redirecting to
+    settings if no credentials are available
+
+    :return:
+    """
+
+    global parsec_user
+    global parsec_passwd
+
+    parsec_user = plugintools.get_setting("parsec_user")
+    parsec_passwd = plugintools.get_setting("parsec_passwd")
+    plugintools.log("parsec checking existance of credentials")
+    if parsec_user != "" and parsec_passwd != "":
+        return True
+    else:
+        answer = xbmcgui.Dialog().yesno(
+            LANG_PARSEC,
+            LANG_MESSAGE_NO_CREDENTIALS,
+            LANG_QUESTION_TO_SETTINGS
+        )
+        if answer == True:
+            plugintools.open_settings_dialog()
+            redirect_to_beginning()
+        return False
+
+def check_credentials():
+    try:
+        get_parsec_session_id()
+    except:
+        answer = xbmcgui.Dialog().yesno(
+            LANG_PARSEC,
+            LANG_MESSAGE_WRONG_CREDENTIALS,
+            LANG_QUESTION_TO_SETTINGS
+        )
+        if answer == True:
+            plugintools.open_settings_dialog()
+            redirect_to_beginning()
+
 
 
 def get_computer_context_menu(computer, numberselect):
@@ -170,9 +228,15 @@ def get_computer_context_menu(computer, numberselect):
 
 
 def connect_to_computer(params):
-    # initializes connection to a running computer
+    """
+    initializes connection to a running computer
+
+    :param params:
+    :return:
+    """
     global current_computer
     global parsec_session_id
+
     computer_json = params.get('computer')
     parsec_session_id = params.get('session_id')
     current_computer = json.loads(computer_json)
@@ -181,16 +245,9 @@ def connect_to_computer(params):
     instance_running = get_is_instance_running()
 
     if instance_running:
-        parsec_user = plugintools.get_setting("parsec_user")
-        parsec_passwd = plugintools.get_setting("parsec_passwd")
-        plugintools.log("parsec checking existance of credentials")
-        if parsec_user != "" and parsec_passwd != "":
-            full_command = "/home/osmc/Scripts/parsec-start/xstart.sh " + parsec_user + " " + parsec_passwd + " " + numberselect
-            output=os.popen(full_command).read()
-            #dialog.ok("Starting X11",output)
-            #print output
-    else:
-        plugintools.message("parsec", "Please add your parsec credentials in addon settings")
+        full_command = "/home/osmc/Scripts/parsec-start/xstart.sh " + parsec_user + " " + parsec_passwd + " " + numberselect
+        os.popen(full_command)
+    pass
 
 
 def manage_computer(params):
@@ -235,8 +292,25 @@ def manage_computer(params):
     )
 
 
+def redirect_to_beginning():
+    """
+    redirects user to start of the app
+
+    :return:
+    """
+    redirect_url = '%s?action=%s' % (sys.argv[0], '')
+
+    xbmc.executebuiltin("Container.Update(%s)" % redirect_url)
+
+
 def redirect_to_main_list(params):
-    # redirecting user to main list
+    """
+    Redirecting to main list with all available params
+
+    :param params:
+    :return:
+    """
+
     global parsec_session_id
 
     redirect_url = '%s?action=%s&title=%s&session_id=%s&computer=%s&thumbnail=%s&fanart=%s&numberselect=%s' % (
@@ -443,6 +517,22 @@ def get_is_instance_running():
     session_id = get_parsec_session_id()
 
     return True
+
+
+def trigger_notification(message, time=5000):
+    """
+    Trigger notification with given message for given time in milliseconds
+
+    :param message:
+    :param time:
+    :return:
+    """
+
+    __addonname__ = addon.getAddonInfo('name')
+    __icon__ = addon.getAddonInfo('icon')
+
+    xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (__addonname__, message, time, __icon__))
+    pass
 
 
 run()

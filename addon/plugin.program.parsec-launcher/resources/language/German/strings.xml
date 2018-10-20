@@ -7,7 +7,8 @@
     <!-- Settings strings -->
     <string id="30001">Parsec Benutzername (E-Mail)</string>
     <string id="30002">Parsec Passwort</string>
-    
+    <string id="30003">Debugmodus</string>
+
     <!-- Main strings -->
     <string id="30020">Mit Computer verbinden</string>
     <string id="30021">Computer verwalten</string>
@@ -16,14 +17,23 @@
     <string id="30024">Computer ausschalten</string>
     <string id="30025">Computer beschäftigt...</string>
     <string id="30026">Parsec</string>
-    <string id="30027">Status</string>
-    <string id="30028">Erstellt</string>
-    <string id="30029">Letztes Update</string>
-    <string id="30030">Anbieter</string>
-    <string id="30031">Computertyp</string>
-    <string id="30032">Region</string>
-    <string id="30033">Guthaben</string>
-    <string id="30034">Spielzeit</string>
+    <string id="30027">[B]Status[/B]</string>
+    <string id="30028">[B]Erstellt[/B]</string>
+    <string id="30029">[B]Letztes Update[/B]</string>
+    <string id="30030">[B]Anbieter[/B]</string>
+    <string id="30031">[B]Computertyp[/B]</string>
+    <string id="30032">[B]Region[/B]</string>
+    <string id="30033">[B][COLOR green]Guthaben[/COLOR][/B]</string>
+    <string id="30034">[B][COLOR green]Spielzeit[/COLOR][/B]</string>
+    <string id="30035">Stunden</string>
+    <string id="30036">$</string>
+    <string id="30037">[B][COLOR blue]Computer-Infos:[/COLOR][/B]</string>
+    <string id="30038">[B][COLOR blue]Benutzer-Infos:[/COLOR][/B]</string>
+    <string id="30039">[B][COLOR green]Benutzername[/COLOR][/B]</string>
+    <string id="30040">Keine Parsec-Zugangsdaten gefunden.</string>
+    <string id="30041">Wollen Sie die Zugangsdaten jetzt bearbeiten?</string>
+    <string id="30042">Die Zugangsdaten wurden abgelehnt.</string>
+
 
     <!-- Message strings -->
     <string id="30200">Der Computer ist beschäftigt</string>

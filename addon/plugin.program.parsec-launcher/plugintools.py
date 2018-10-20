@@ -588,7 +588,7 @@ def add_computer_list_item(action="", title="", thumbnail="", fanart="", session
     listitem = xbmcgui.ListItem(title, iconImage="DefaultVideo.png", thumbnailImage=thumbnail)
 
     if info_labels is None:
-        info_labels = {"Title": title, "Plot": get_computer_info(computer,user)}
+        info_labels = {"Title": title, "Plot": get_computer_info(computer, user)}
 
     listitem.setInfo("video", info_labels)
 
@@ -607,13 +607,13 @@ def add_computer_list_item(action="", title="", thumbnail="", fanart="", session
 
         listitem.addContextMenuItems(context_entries)
 
-
-    itemurl = '%s?action=%s&title=%s&session_id=%s&computer=%s&thumbnail=%s&fanart=%s&numberselect=%s' % (
+    itemurl = '%s?action=%s&title=%s&session_id=%s&computer=%s&user=%s&thumbnail=%s&fanart=%s&numberselect=%s' % (
         sys.argv[0],
         action,
         urllib.quote_plus(title),
         urllib.quote_plus(session_id),
         urllib.quote_plus(computer),
+        urllib.quote_plus(user),
         urllib.quote_plus(thumbnail),
         urllib.quote_plus(fanart),
         numberselect,
@@ -634,17 +634,30 @@ def get_computer_info(computer_json, user_json):
     LANG_TITLE_REGION = addon.getLocalizedString(30032).encode('utf-8')
     LANG_TITLE_CREDIT = addon.getLocalizedString(30033).encode('utf-8')
     LANG_TITLE_PLAYTIME = addon.getLocalizedString(30034).encode('utf-8')
+    LANG_TITLE_HOURS = addon.getLocalizedString(30035).encode('utf-8')
+    LANG_TITLE_DOLLAR = addon.getLocalizedString(30036).encode('utf-8')
+    LANG_TITLE_COMPUTER_INFO = addon.getLocalizedString(30037).encode('utf-8')
+    LANG_TITLE_USER_INFO = addon.getLocalizedString(30038).encode('utf-8')
+    LANG_TITLE_USERNAME = addon.getLocalizedString(30039).encode('utf-8')
 
-    credits_dollar = str(user['credits']/100)
-    play_time = str(user['play_time']/60/60)
+    credits_dollar = float(float(user['credits'])/100)
+    credits_dollar = str(credits_dollar)
+    credits_dollar = LANG_TITLE_DOLLAR + credits_dollar
+    play_time = str(user['play_time']/60/60) + " " +  LANG_TITLE_HOURS
 
+    # building string
     computer_info = ""
+    computer_info += LANG_TITLE_COMPUTER_INFO
+    computer_info += "\n"
     computer_info += LANG_TITLE_STATUS + ": " + computer['status'] + "\n"
     computer_info += LANG_TITLE_CREATED + ": " + computer['created_at'] + "\n"
     computer_info += LANG_TITLE_LAST_UPDATED + ": " + computer['updated_at'] + "\n"
     computer_info += LANG_TITLE_PROVIDER + ": " + computer['managed']['provider_name'] + "\n"
     computer_info += LANG_TITLE_MACHINE_TYPE + ": " + computer['managed']['machine_type'] + "\n"
     computer_info += LANG_TITLE_REGION + ": " + computer['managed']['region'] + "\n"
+    computer_info += LANG_TITLE_USER_INFO
+    computer_info += "\n"
+    computer_info += LANG_TITLE_USERNAME + ": " + user['name'] + "\n"
     computer_info += LANG_TITLE_CREDIT + ": " + credits_dollar + "\n"
     computer_info += LANG_TITLE_PLAYTIME + ": " + play_time + "\n"
 
