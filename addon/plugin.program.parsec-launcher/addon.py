@@ -6,6 +6,7 @@
 # main imports
 import sys
 import os
+import shutil
 import urllib
 import urllib2
 import requests
@@ -104,7 +105,29 @@ def run():
         action = params.get("action")
         exec action+"(params)"
     plugintools.close_item_list()
-    pass
+
+
+def clear_cache():
+    """
+    Clearing cache for making sure we will always have a fresh start
+    at this point
+
+    :return:
+    """
+
+    path = xbmc.translatePath('special://temp')
+
+    if os.path.exists(path):
+        for f in os.listdir(path):
+            fpath = os.path.join(path, f)
+            try:
+                if os.path.isfile(fpath):
+                    if not fpath.lower().endswith('.log'):
+                        os.unlink(fpath)
+                elif os.path.isdir(fpath):
+                    shutil.rmtree(fpath)
+            except Exception as e:
+                plugintools.log(e)
 
 
 def main_list(params):
@@ -115,6 +138,8 @@ def main_list(params):
     :param params:
     :return:
     """
+
+    clear_cache()
 
     global current_computer
     global parsec_session_id
@@ -185,6 +210,7 @@ def check_credentials():
 
     :return:
     """
+
     try:
         get_parsec_session_id()
     except:
@@ -284,7 +310,13 @@ def connect_to_computer(params):
 
 
 def manage_computer(params):
-    # Lists actions for computer
+    """
+    Lists actions for computer
+
+    :param params:
+    :return:
+    """
+
     global current_computer
     global parsec_session_id
 
@@ -331,6 +363,7 @@ def redirect_to_beginning():
 
     :return:
     """
+
     redirect_url = '%s?action=%s' % (sys.argv[0], '')
 
     xbmc.executebuiltin("Container.Update(%s)" % redirect_url)
@@ -361,7 +394,13 @@ def redirect_to_main_list(params):
 
 
 def switch_computer_on(params):
-    # trigger switching on the computer
+    """
+    trigger switching on the computer
+
+    :param params:
+    :return:
+    """
+
     global current_computer
     global parsec_session_id
     computer_json = params.get('computer')
@@ -376,7 +415,13 @@ def switch_computer_on(params):
 
 
 def switch_computer_off(params):
-    # trigger switching off the computer
+    """
+    trigger switching off the computer
+
+    :param params:
+    :return:
+    """
+
     global current_computer
     global parsec_session_id
     computer_json = params.get('computer')
@@ -391,11 +436,25 @@ def switch_computer_off(params):
 
 
 def switch_computer_pending(params):
+    """
+    trigger switching notify user that machines current state
+    is pending
+
+    :param params:
+    :return:
+    """
+
     trigger_notification(LANG_TITLE_MANAGE_COMPUTER_MESSAGE_PENDING)
     pass
 
 
 def get_computer_title():
+    """
+    Returns title of current computer
+
+    :return:
+    """
+
     global current_computer
     # returns computer name
     computer_title = current_computer['name'] + " (" + current_computer['status'] + ")"
