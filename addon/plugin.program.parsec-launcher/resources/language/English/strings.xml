@@ -7,6 +7,8 @@
     <!-- Settings strings -->
     <string id="30001">Parsec Username (E-Mail)</string>
     <string id="30002">Parsec Password</string>
+    <string id="30003">Debugmode</string>
+
     
     <!-- Main strings -->
     <string id="30020">Connect to computer</string>
@@ -24,9 +26,21 @@
     <string id="30032">Region</string>
     <string id="30033">Credit</string>
     <string id="30034">Playtime</string>
+    <string id="30035">Hours</string>
+    <string id="30036">$</string>
+    <string id="30037">[B][COLOR blue]Computer-Details:[/COLOR][/B]</string>
+    <string id="30038">[B][COLOR blue]User-Details:[/COLOR][/B]</string>
+    <string id="30039">[B][COLOR green]Username[/COLOR][/B]</string>
+    <string id="30040">Did not find user credentials.</string>
+    <string id="30041">Do you want to setup credentials now?</string>
+    <string id="30042">Credentials have been declined.</string>
+    <string id="30043">The computer is switched off</string>
+    <string id="30044">Do you want to switch it on?</string>
+    <string id="30045">The computer is switched on</string>
+    <string id="30046">Status checking aborted</string>
 
     <!-- Message strings -->
     <string id="30200">This computer is busy</string>
     <string id="30201">Starting up</string>
-    <string id="30201">Switching off</string>
+    <string id="30202">Switching off</string>
 </strings>

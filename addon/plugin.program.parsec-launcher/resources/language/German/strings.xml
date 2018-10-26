@@ -33,10 +33,13 @@
     <string id="30040">Keine Parsec-Zugangsdaten gefunden.</string>
     <string id="30041">Wollen Sie die Zugangsdaten jetzt bearbeiten?</string>
     <string id="30042">Die Zugangsdaten wurden abgelehnt.</string>
-
+    <string id="30043">Der Computer ist ausgeschaltet</string>
+    <string id="30044">Wollen Sie ihn einschalten?</string>
+    <string id="30045">Der Computer ist eingeschaltet</string>
+    <string id="30046">Statusüberwachung abgebrochen</string>
 
     <!-- Message strings -->
     <string id="30200">Der Computer ist beschäftigt</string>
     <string id="30201">Wird eingeschaltet</string>
-    <string id="30201">Wird ausgeschaltet</string>
+    <string id="30202">Wird ausgeschaltet</string>
 </strings>
