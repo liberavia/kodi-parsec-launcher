@@ -6,6 +6,7 @@
 # main imports
 import sys
 import os
+import stat
 import shutil
 import urllib
 import urllib2
@@ -128,6 +129,27 @@ def clear_cache():
                     shutil.rmtree(fpath)
             except Exception as e:
                 plugintools.log(e)
+
+def check_install():
+    """
+    perform install checks
+
+    :return:
+    """
+
+    check_bin_executable()
+
+
+def check_bin_executable():
+    """
+    Make sure scripts are executable
+
+    :return:
+    """
+
+    for binfile in os.listdir(ADDON_BIN_PATH):
+        if os.path.isfile(binfile):
+            os.chmod(binfile, st.st_mode | stat.S_IEXEC)
 
 
 def main_list(params):
