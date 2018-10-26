@@ -35,7 +35,7 @@ API_USER_INFO = API_BASEURL + "me"
 API_SWITCH_COMPUTER_ON = API_BASEURL + "activate-lease"
 API_SWITCH_COMPUTER_OFF = API_BASEURL + "deactivate-lease"
 ADDON_BASE_PATH = os.path.dirname(__file__)
-ADDON_SCRIPT_PATH = os.path.join(ADDON_BASE_PATH, 'scripts')
+ADDON_BIN_PATH = os.path.join(ADDON_BASE_PATH, 'bin')
 THUMBNAIL_PATH = os.path.join(plugintools.get_runtime_path(), "resources", "img")
 DEFAULT_FANART = os.path.join(plugintools.get_runtime_path(), "fanart.jpg")
 DEFAULT_LOGO = os.path.join(THUMBNAIL_PATH, "parsec-logo.png")
@@ -291,8 +291,16 @@ def connect_to_computer(params):
     instance_running = get_is_instance_running(current_computer)
     instance_off = get_is_instance_off(current_computer)
 
+    start_command = ADDON_BIN_PATH + "/xstart.sh "
+
+    connect_params = []
+    connect_params.append(parsec_user)
+    connect_params.append(parsec_passwd)
+    connect_params.append(numberselect)
+    connect_params.append(ADDON_BIN_PATH)
+
     if instance_running:
-        full_command = "/home/osmc/Scripts/parsec-start/xstart.sh " + parsec_user + " " + parsec_passwd + " " + numberselect
+        full_command = start_command + ' ' + ' '.join(connect_params)
         os.popen(full_command)
     elif instance_off:
         answer = xbmcgui.Dialog().yesno(
