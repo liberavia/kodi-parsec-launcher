@@ -647,6 +647,11 @@ def get_computer_info(computer_json, user_json):
 
     # building string
     computer_info = ""
+    computer_info += LANG_TITLE_USER_INFO
+    computer_info += "\n"
+    computer_info += LANG_TITLE_USERNAME + ": " + user['name'] + "\n"
+    computer_info += LANG_TITLE_CREDIT + ": " + credits_dollar + "\n"
+    computer_info += LANG_TITLE_PLAYTIME + ": " + play_time + "\n"
     computer_info += LANG_TITLE_COMPUTER_INFO
     computer_info += "\n"
     computer_info += LANG_TITLE_STATUS + ": " + computer['status'] + "\n"
@@ -655,11 +660,6 @@ def get_computer_info(computer_json, user_json):
     computer_info += LANG_TITLE_PROVIDER + ": " + computer['managed']['provider_name'] + "\n"
     computer_info += LANG_TITLE_MACHINE_TYPE + ": " + computer['managed']['machine_type'] + "\n"
     computer_info += LANG_TITLE_REGION + ": " + computer['managed']['region'] + "\n"
-    computer_info += LANG_TITLE_USER_INFO
-    computer_info += "\n"
-    computer_info += LANG_TITLE_USERNAME + ": " + user['name'] + "\n"
-    computer_info += LANG_TITLE_CREDIT + ": " + credits_dollar + "\n"
-    computer_info += LANG_TITLE_PLAYTIME + ": " + play_time + "\n"
 
     return computer_info
 
