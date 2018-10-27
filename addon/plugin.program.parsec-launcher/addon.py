@@ -130,6 +130,7 @@ def clear_cache():
             except Exception as e:
                 plugintools.log(e)
 
+
 def check_install():
     """
     perform install checks
