@@ -9,7 +9,6 @@
     <string id="30002">Parsec Password</string>
     <string id="30003">Debugmode</string>
 
-    
     <!-- Main strings -->
     <string id="30020">Connect to computer</string>
     <string id="30021">Manage computers</string>
@@ -31,16 +30,24 @@
     <string id="30037">[B][COLOR blue]Computer-Details:[/COLOR][/B]</string>
     <string id="30038">[B][COLOR blue]User-Details:[/COLOR][/B]</string>
     <string id="30039">[B][COLOR green]Username[/COLOR][/B]</string>
-    <string id="30040">Did not find user credentials.</string>
-    <string id="30041">Do you want to setup credentials now?</string>
-    <string id="30042">Credentials have been declined.</string>
-    <string id="30043">The computer is switched off</string>
-    <string id="30044">Do you want to switch it on?</string>
-    <string id="30045">The computer is switched on</string>
-    <string id="30046">Status checking aborted</string>
 
     <!-- Message strings -->
     <string id="30200">This computer is busy</string>
     <string id="30201">Starting up</string>
     <string id="30202">Switching off</string>
+    <string id="30204">Update running...</string>
+    <string id="30205">Missing system packages</string>
+    <string id="30207">Installing system packages</string>
+    <string id="30208">Did not find user credentials.</string>
+    <string id="30209">Credentials have been declined.</string>
+    <string id="30210">The computer is switched off</string>
+    <string id="30211">The computer is switched on</string>
+    <string id="30212">Status checking aborted</string>
+    <string id="30213">Maintenance. Please wait...</string>
+    <string id="30214">The addon is incompatible with your platform</string>
+
+    <!-- Question string -->
+    <string id="30500">Do you want to setup credentials now?</string>
+    <string id="30501">Do you want to switch it on?</string>
+    <string id="30502">Do you want to install missing system packages now?</string>
 </strings>

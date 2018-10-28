@@ -23,6 +23,7 @@ import pprint
 import base64
 import json
 
+
 module_log_enabled = False
 http_debug_log_enabled = False
 
@@ -58,8 +59,8 @@ def _log(message):
     """
 
     if module_log_enabled:
-        #message = message.encode('utf-8')
-        xbmc.log("plugintools."+message)
+        # message = message.encode('utf-8')
+        xbmc.log("addontools."+message)
 
 
 def clear_cache():
@@ -187,7 +188,7 @@ def close_item_list():
 def get_temp_path():
     _log("get_temp_path")
 
-    dev = xbmc.translatePath( "special://temp/" )
+    dev = xbmc.translatePath("special://temp/")
     _log("get_temp_path ->'"+str(dev)+"'")
 
     return dev
@@ -196,7 +197,7 @@ def get_temp_path():
 def get_runtime_path():
     _log("get_runtime_path")
 
-    dev = xbmc.translatePath( __settings__.getAddonInfo('Path') )
+    dev = xbmc.translatePath(__settings__.getAddonInfo('Path'))
     _log("get_runtime_path ->'"+str(dev)+"'")
 
     return dev
@@ -205,7 +206,7 @@ def get_runtime_path():
 def get_data_path():
     _log("get_data_path")
 
-    dev = xbmc.translatePath( __settings__.getAddonInfo('Profile') )
+    dev = xbmc.translatePath(__settings__.getAddonInfo('Profile'))
     
     if not os.path.exists(dev):
         os.makedirs(dev)
@@ -310,7 +311,7 @@ def trigger_notification(message, time=5000):
     :param time:
     :return:
     """
-    addon = xbmcaddon.Addon(id='plugin.program.parsec-launcher')
+    addon = xbmcaddon.Addon(id=addon_id)
     __addonname__ = addon.getAddonInfo('name')
     __icon__ = addon.getAddonInfo('icon')
 
@@ -318,10 +319,74 @@ def trigger_notification(message, time=5000):
     pass
 
 
-def selector(option_list,title="Select one"):
+def redirect_to_kodi_main():
+    """
+    Returns user to home screen
+
+    :return:
+    """
+
+    xbmc.executebuiltin('Container.Update(path,replace)')
+
+
+def redirect_to_addon_main():
+    """
+    redirects user to start of the app
+
+    :return:
+    """
+
+    redirect_url = '%s?action=%s' % (sys.argv[0], '')
+
+    xbmc.executebuiltin("Container.Update(%s)" % redirect_url)
+
+    pass
+
+
+def lock_addon(set_locked, reason=False):
+    """
+    Locks the addon
+
+    :param set_locked:
+    :return:
+    """
+
+    if not reason:
+        reason = addonlang.LANG_MESSAGE_LOCKED_UPDATE_WORK
+
+    lock_file = '/tmp/' + addon_id
+
+    if set_locked:
+        file(lock_file, 'w')
+        trigger_notification(reason, 10000)
+    else:
+        os.remove(lock_file)
+        trigger_notification(LANG_UNLOCKED)
+
+
+def is_addon_locked():
+    """
+    Checks if addon is set to locked
+
+    :return:
+    """
+    lock_file = '/tmp/' + addon_id
+
+    return os.path.isfile(lock_file)
+
+
+def selector(option_list, title="Select one"):
+    """
+    Returns a user-selection of given options list
+
+    :param option_list:
+    :param title:
+    :return:
+    """
+
     _log("selector title='"+title+"', options="+repr(option_list))
 
     dia = xbmcgui.Dialog()
-    selection = dia.select(title,option_list)
+    selection = dia.select(title, option_list)
 
     return selection

@@ -48,24 +48,24 @@ def get_computer_info(computer_json, user_json):
 
     credits_dollar = float(float(user['credits'])/100)
     credits_dollar = str(credits_dollar)
-    credits_dollar = addonlang.LANG_TITLE_DOLLAR + credits_dollar
-    play_time = str(user['play_time']/60/60) + " " + addonlang.LANG_TITLE_HOURS
+    credits_dollar = addonlang.LANG_DOLLAR + credits_dollar
+    play_time = str(user['play_time']/60/60) + " " + addonlang.LANG_HOURS
 
     # building string
     computer_info = ""
-    computer_info += addonlang.LANG_TITLE_USER_INFO
+    computer_info += addonlang.LANG_USER_INFO
     computer_info += "\n"
-    computer_info += addonlang.LANG_TITLE_USERNAME + ": " + user['name'] + "\n"
-    computer_info += addonlang.LANG_TITLE_CREDIT + ": " + credits_dollar + "\n"
-    computer_info += addonlang.LANG_TITLE_PLAYTIME + ": " + play_time + "\n"
-    computer_info += addonlang.LANG_TITLE_COMPUTER_INFO
+    computer_info += addonlang.LANG_USERNAME + ": " + user['name'] + "\n"
+    computer_info += addonlang.LANG_CREDIT + ": " + credits_dollar + "\n"
+    computer_info += addonlang.LANG_PLAYTIME + ": " + play_time + "\n"
+    computer_info += addonlang.LANG_COMPUTER_INFO
     computer_info += "\n"
-    computer_info += addonlang.LANG_TITLE_STATUS + ": " + computer['status'] + "\n"
-    computer_info += addonlang.LANG_TITLE_CREATED + ": " + computer['created_at'] + "\n"
-    computer_info += addonlang.LANG_TITLE_LAST_UPDATED + ": " + computer['updated_at'] + "\n"
-    computer_info += addonlang.LANG_TITLE_PROVIDER + ": " + computer['managed']['provider_name'] + "\n"
-    computer_info += addonlang.LANG_TITLE_MACHINE_TYPE + ": " + computer['managed']['machine_type'] + "\n"
-    computer_info += addonlang.LANG_TITLE_REGION + ": " + computer['managed']['region'] + "\n"
+    computer_info += addonlang.LANG_STATUS + ": " + computer['status'] + "\n"
+    computer_info += addonlang.LANG_CREATED + ": " + computer['created_at'] + "\n"
+    computer_info += addonlang.LANG_LAST_UPDATED + ": " + computer['updated_at'] + "\n"
+    computer_info += addonlang.LANG_PROVIDER + ": " + computer['managed']['provider_name'] + "\n"
+    computer_info += addonlang.LANG_MACHINE_TYPE + ": " + computer['managed']['machine_type'] + "\n"
+    computer_info += addonlang.LANG_REGION + ": " + computer['managed']['region'] + "\n"
 
     return computer_info
 
@@ -194,9 +194,9 @@ def background_target_state_create(target_state, computer_id):
     background_repeats = 0
 
     if target_state == 'on':
-        LANG_ACTION = addonlang.LANG_TITLE_MANAGE_COMPUTER_MESSAGE_ON
+        LANG_ACTION = addonlang.LANG_MESSAGE_COMPUTER_SWITCHED_ON
     else:
-        LANG_ACTION = addonlang.LANG_TITLE_MANAGE_COMPUTER_MESSAGE_OFF
+        LANG_ACTION = addonlang.LANG_MESSAGE_COMPUTER_SWITCHED_OFF
 
     background_dialog = xbmcgui.DialogProgressBG()
     background_dialog.create(addonlang.LANG_PARSEC, LANG_ACTION)

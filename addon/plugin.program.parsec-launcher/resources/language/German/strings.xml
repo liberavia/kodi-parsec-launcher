@@ -30,16 +30,24 @@
     <string id="30037">[B][COLOR blue]Computer-Infos:[/COLOR][/B]</string>
     <string id="30038">[B][COLOR blue]Benutzer-Infos:[/COLOR][/B]</string>
     <string id="30039">[B][COLOR green]Benutzername[/COLOR][/B]</string>
-    <string id="30040">Keine Parsec-Zugangsdaten gefunden.</string>
-    <string id="30041">Wollen Sie die Zugangsdaten jetzt bearbeiten?</string>
-    <string id="30042">Die Zugangsdaten wurden abgelehnt.</string>
-    <string id="30043">Der Computer ist ausgeschaltet</string>
-    <string id="30044">Wollen Sie ihn einschalten?</string>
-    <string id="30045">Der Computer ist eingeschaltet</string>
-    <string id="30046">Statusüberwachung abgebrochen</string>
 
     <!-- Message strings -->
     <string id="30200">Der Computer ist beschäftigt</string>
     <string id="30201">Wird eingeschaltet</string>
     <string id="30202">Wird ausgeschaltet</string>
+    <string id="30204">Update läuft...</string>
+    <string id="30205">Fehlende Systempakete</string>
+    <string id="30207">Installiere Systempakete</string>
+    <string id="30208">Keine Parsec-Zugangsdaten gefunden.</string>
+    <string id="30209">Die Zugangsdaten wurden abgelehnt.</string>
+    <string id="30210">Der Computer ist ausgeschaltet</string>
+    <string id="30211">Der Computer ist eingeschaltet</string>
+    <string id="30212">Statusüberwachung abgebrochen</string>
+    <string id="30213">Wartungsarbeiten. Bitte warten...</string>
+    <string id="30214">Das Addon ist nicht kompatibel mit Ihrer Betriebssystemplattform</string>
+
+    <!-- Question strings -->
+    <string id="30500">Wollen Sie die Zugangsdaten jetzt bearbeiten?</string>
+    <string id="30501">Wollen Sie ihn einschalten?</string>
+    <string id="30502">Wollen Sie die fehlenden Systempakete jetzt installieren?</string>
 </strings>

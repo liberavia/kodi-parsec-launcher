@@ -1,38 +1,56 @@
-
+# -*- coding: utf-8 -*-
+"""
+Addon language strings
+"""
 
 import xbmcaddon
 
+
 addon = xbmcaddon.Addon(id='plugin.program.parsec-launcher')
 
-# Language strings
-LANG_TITLE_CONNECT_PARSEC=addon.getLocalizedString(30020).encode('utf-8')
-LANG_TITLE_MANAGE_COMPUTERS=addon.getLocalizedString(30021).encode('utf-8')
-LANG_TITLE_MANAGE=addon.getLocalizedString(30022).encode('utf-8')
-LANG_TITLE_MANAGE_COMPUTER_SWITCH_ON=addon.getLocalizedString(30023).encode('utf-8')
-LANG_TITLE_MANAGE_COMPUTER_SWITCH_OFF=addon.getLocalizedString(30024).encode('utf-8')
-LANG_TITLE_MANAGE_COMPUTER_IS_PENDING=addon.getLocalizedString(30025).encode('utf-8')
-LANG_PARSEC=addon.getLocalizedString(30026).encode('utf-8')
-LANG_TITLE_STATUS=addon.getLocalizedString(30027).encode('utf-8')
-LANG_TITLE_CREATED=addon.getLocalizedString(30028).encode('utf-8')
-LANG_TITLE_LAST_UPDATED=addon.getLocalizedString(30029).encode('utf-8')
-LANG_TITLE_PROVIDER=addon.getLocalizedString(30030).encode('utf-8')
-LANG_TITLE_MACHINE_TYPE=addon.getLocalizedString(30031).encode('utf-8')
-LANG_TITLE_REGION=addon.getLocalizedString(30032).encode('utf-8')
-LANG_TITLE_CREDIT=addon.getLocalizedString(30033).encode('utf-8')
-LANG_TITLE_PLAYTIME=addon.getLocalizedString(30034).encode('utf-8')
-LANG_TITLE_HOURS = addon.getLocalizedString(30035).encode('utf-8')
-LANG_TITLE_DOLLAR = addon.getLocalizedString(30036).encode('utf-8')
-LANG_TITLE_COMPUTER_INFO = addon.getLocalizedString(30037).encode('utf-8')
-LANG_TITLE_USER_INFO = addon.getLocalizedString(30038).encode('utf-8')
-LANG_TITLE_USERNAME = addon.getLocalizedString(30039).encode('utf-8')
-LANG_MESSAGE_NO_CREDENTIALS=addon.getLocalizedString(30040).encode('utf-8')
-LANG_QUESTION_TO_SETTINGS=addon.getLocalizedString(30041).encode('utf-8')
-LANG_MESSAGE_WRONG_CREDENTIALS=addon.getLocalizedString(30042).encode('utf-8')
-LANG_MESSAGE_COMPUTER_OFF=addon.getLocalizedString(30043).encode('utf-8')
-LANG_QUESTION_QUESTION_SWITCH_ON=addon.getLocalizedString(30044).encode('utf-8')
-LANG_MESSAGE_COMPUTER_ON=addon.getLocalizedString(30045).encode('utf-8')
-LANG_MESSAGE_BACKGROUND_TASK_BREAK=addon.getLocalizedString(30046).encode('utf-8')
 
-LANG_TITLE_MANAGE_COMPUTER_MESSAGE_PENDING=addon.getLocalizedString(30200).encode('utf-8')
-LANG_TITLE_MANAGE_COMPUTER_MESSAGE_ON=addon.getLocalizedString(30201).encode('utf-8')
-LANG_TITLE_MANAGE_COMPUTER_MESSAGE_OFF=addon.getLocalizedString(30202).encode('utf-8')
+def translate_code(code):
+    return addon.getLocalizedString(code).encode('utf-8')
+
+
+# Language strings
+LANG_CONNECT_PARSEC = translate_code(30020)
+LANG_MANAGE_COMPUTERS = translate_code(30021)
+LANG_MANAGE = translate_code(30022)
+LANG_MANAGE_COMPUTER_SWITCH_ON = translate_code(30023)
+LANG_MANAGE_COMPUTER_SWITCH_OFF = translate_code(30024)
+LANG_MANAGE_COMPUTER_IS_PENDING = translate_code(30025)
+LANG_PARSEC = translate_code(30026)
+LANG_STATUS = translate_code(30027)
+LANG_CREATED = translate_code(30028)
+LANG_LAST_UPDATED = translate_code(30029)
+LANG_PROVIDER = translate_code(30030)
+LANG_MACHINE_TYPE = translate_code(30031)
+LANG_REGION = translate_code(30032)
+LANG_CREDIT = translate_code(30033)
+LANG_PLAYTIME = translate_code(30034)
+LANG_HOURS = translate_code(30035)
+LANG_DOLLAR = translate_code(30036)
+LANG_COMPUTER_INFO = translate_code(30037)
+LANG_USER_INFO = translate_code(30038)
+LANG_USERNAME = translate_code(30039)
+
+LANG_MESSAGE_COMPUTER_PENDING = translate_code(30200)
+LANG_MESSAGE_COMPUTER_SWITCHED_ON = translate_code(30201)
+LANG_MESSAGE_COMPUTER_SWITCHED_OFF = translate_code(30202)
+LANG_MESSAGE_LOCKED = translate_code(30203)
+LANG_MESSAGE_LOCKED_UPDATE_WORK = translate_code(30204)
+LANG_MESSAGE_MISSING_PACKAGES = translate_code(30205)
+LANG_MESSAGE_INSTALL_MISSING = translate_code(30207)
+LANG_MESSAGE_NO_CREDENTIALS = translate_code(30208)
+LANG_MESSAGE_WRONG_CREDENTIALS = translate_code(30209)
+LANG_MESSAGE_COMPUTER_OFF = translate_code(30210)
+LANG_MESSAGE_COMPUTER_ON = translate_code(30211)
+LANG_MESSAGE_BACKGROUND_TASK_BREAK = translate_code(30212)
+LANG_MESSAGE_LOCKED = translate_code(30213)
+LANG_MESSAGE_WRONG_PLATFORM = translate_code(30214)
+
+LANG_QUESTION_TO_SETTINGS = translate_code(30500)
+LANG_QUESTION_QUESTION_SWITCH_ON = translate_code(30501)
+LANG_QUESTION_INSTALL_MISSING_PACKAGES = translate_code(30502)
+

@@ -19,6 +19,8 @@ import xbmcaddon
 from lib import addonutils
 from lib import addonlang
 from lib import parsec
+from installer import osmanager
+
 
 # plugin constants
 __plugin__ = "Parsec"
@@ -50,6 +52,16 @@ def run():
     """
     addonutils.log("kodi-parsec.run")
 
+    if addonutils.is_addon_locked():
+        addonutils.trigger_notification(addonlang.LANG_MESSAGE_LOCKED)
+        addonutils.redirect_to_kodi_main()
+
+    # check if everything is ready to go
+    os_installer = osmanager.get_os_installer()
+    if os_installer == False:
+        abort_addon_platform()
+    os_installer.complete_install_check()
+
     # Get params
     params = addonutils.get_params()
 
@@ -62,26 +74,17 @@ def run():
     addonutils.close_item_list()
 
 
-def check_install():
+def abort_addon_platform():
     """
-    perform install checks
+    Will leave a message and exit addon
 
     :return:
     """
 
-    check_bin_executable()
-
-
-def check_bin_executable():
-    """
-    Make sure scripts are executable
-
-    :return:
-    """
-
-    for binfile in os.listdir(ADDON_BIN_PATH):
-        if os.path.isfile(binfile):
-            os.chmod(binfile, st.st_mode | stat.S_IEXEC)
+    addonutils.trigger_notification(
+        addonlang.LANG_MESSAGE_WRONG_PLATFORM
+    )
+    addonutils.redirect_to_kodi_main()
 
 
 def main_list(params):
@@ -150,7 +153,7 @@ def user_credentials_available():
         )
         if answer == True:
             addonutils.open_settings_dialog()
-            redirect_to_beginning()
+            addonutils.redirect_to_addon_main()
         return False
 
 
@@ -172,7 +175,9 @@ def check_credentials():
         )
         if answer == True:
             addonutils.open_settings_dialog()
-            redirect_to_beginning()
+            addonutils.redirect_to_addon_main()
+        else:
+            addonutils.redirect_to_kodi_main()
 
 
 def get_computer_context_menu(computer, numberselect):
@@ -200,7 +205,7 @@ def get_computer_context_menu(computer, numberselect):
     )
 
     connect_action ='connect_to_computer'
-    context_label_connect_computer = addonlang.LANG_TITLE_CONNECT_PARSEC
+    context_label_connect_computer = addonlang.LANG_CONNECT_PARSEC
     context_url_connect_computer = '%s?action=%s&title=%s&session_id=%s&computer=%s&thumbnail=%s&fanart=%s&numberselect=%s' % (
         sys.argv[0],
         connect_action,
@@ -239,11 +244,12 @@ def connect_to_computer(params):
 
     start_command = ADDON_BIN_PATH + "/xstart.sh "
 
-    connect_params = []
-    connect_params.append(parsec_user)
-    connect_params.append(parsec_passwd)
-    connect_params.append(numberselect)
-    connect_params.append(ADDON_BIN_PATH)
+    connect_params = (
+        parsec_user,
+        parsec_passwd,
+        numberselect,
+        ADDON_BIN_PATH
+    )
 
     if instance_running:
         full_command = start_command + ' ' + ' '.join(connect_params)
@@ -256,13 +262,13 @@ def connect_to_computer(params):
         )
         if answer == True:
             switch_computer_on(params)
-            redirect_to_beginning()
+            addonutils.redirect_to_kodi_main()
     else:
         xbmcgui.Dialog().ok(
             addonlang.LANG_PARSEC,
-            addonlang.LANG_TITLE_MANAGE_COMPUTER_MESSAGE_PENDING
+            addonlang.LANG_MESSAGE_COMPUTER_PENDING
         )
-        redirect_to_beginning()
+        addonutils.redirect_to_addon_main()
     pass
 
 
@@ -298,7 +304,7 @@ def manage_computer(params):
 
     addonutils.add_computer_list_item(
         action='connect_to_computer',
-        title=addonlang.LANG_TITLE_CONNECT_PARSEC,
+        title=addonlang.LANG_CONNECT_PARSEC,
         session_id=parsec_session_id,
         computer=computer_json,
         user=user_json,
@@ -308,20 +314,6 @@ def manage_computer(params):
         folder=False,
         context=False
     )
-
-    pass
-
-
-def redirect_to_beginning():
-    """
-    redirects user to start of the app
-
-    :return:
-    """
-
-    redirect_url = '%s?action=%s' % (sys.argv[0], '')
-
-    xbmc.executebuiltin("Container.Update(%s)" % redirect_url)
 
     pass
 
@@ -369,7 +361,7 @@ def switch_computer_on(params):
     switch_computer_state('on', computer_id)
 
     addonutils.trigger_notification(
-        addonlang.LANG_TITLE_MANAGE_COMPUTER_MESSAGE_ON
+        addonlang.LANG_MESSAGE_COMPUTER_SWITCHED_ON
     )
     redirect_to_main_list(params)
 
@@ -393,7 +385,7 @@ def switch_computer_off(params):
     switch_computer_state('off', computer_id)
 
     addonutils.trigger_notification(
-        addonlang.LANG_TITLE_MANAGE_COMPUTER_MESSAGE_OFF
+        addonlang.LANG_MESSAGE_COMPUTER_SWITCHED_OFF
     )
     redirect_to_main_list(params)
 
@@ -410,7 +402,7 @@ def switch_computer_pending(params):
     """
 
     addonutils.trigger_notification(
-        addonlang.LANG_TITLE_MANAGE_COMPUTER_MESSAGE_PENDING
+        addonlang.LANG_MESSAGE_COMPUTER_PENDING
     )
 
     pass
@@ -479,11 +471,11 @@ def get_target_title():
     global current_computer
 
     if current_computer['status'] == 'off':
-        target_title = addonlang.LANG_TITLE_MANAGE_COMPUTER_SWITCH_ON
+        target_title = addonlang.LANG_MANAGE_COMPUTER_SWITCH_ON
     elif current_computer['status'] == 'on':
-        target_title = addonlang.LANG_TITLE_MANAGE_COMPUTER_SWITCH_OFF
+        target_title = addonlang.LANG_MANAGE_COMPUTER_SWITCH_OFF
     else:
-        target_title = addonlang.LANG_TITLE_MANAGE_COMPUTER_IS_PENDING
+        target_title = addonlang.LANG_MANAGE_COMPUTER_IS_PENDING
 
     return target_title
 
