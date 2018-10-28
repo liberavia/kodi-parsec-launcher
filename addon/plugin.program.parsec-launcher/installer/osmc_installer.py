@@ -216,7 +216,9 @@ def get_installed_packages():
 
     if not installed_packages:
         installed_packages = []
-        os.popen('apt list --installed > ' + ADDON_INSTALLED_TMP_FILE, 'r', 1)
+        if not os.path.isfile(ADDON_INSTALLED_TMP_FILE):
+            os.popen('apt list --installed > ' + ADDON_INSTALLED_TMP_FILE, 'r', 1)
+
         with open(ADDON_INSTALLED_TMP_FILE) as f:
             for line in f:
                 line_parts = line.split('/')
