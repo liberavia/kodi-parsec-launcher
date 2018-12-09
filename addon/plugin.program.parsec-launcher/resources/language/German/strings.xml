@@ -30,6 +30,7 @@
     <string id="30037">[B][COLOR blue]Computer-Infos:[/COLOR][/B]</string>
     <string id="30038">[B][COLOR blue]Benutzer-Infos:[/COLOR][/B]</string>
     <string id="30039">[B][COLOR green]Benutzername[/COLOR][/B]</string>
+    <string id="30040">Installiere</string>
 
     <!-- Message strings -->
     <string id="30200">Der Computer ist beschäftigt</string>

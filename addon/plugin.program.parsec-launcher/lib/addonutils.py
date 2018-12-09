@@ -27,18 +27,6 @@ import json
 module_log_enabled = False
 http_debug_log_enabled = False
 
-f = open(os.path.join(os.path.dirname(__file__), "..", "addon.xml"))
-data = f.read()
-f.close()
-
-addon_id = find_single_match(data, 'id="([^"]+)"')
-if addon_id == "":
-    addon_id = find_single_match(data, "id='([^']+)'")
-
-__settings__ = xbmcaddon.Addon(id=addon_id)
-__language__ = __settings__.getLocalizedString
-
-
 def log(message):
     """
     Write into kodi log
@@ -47,7 +35,7 @@ def log(message):
     :return:
     """
 
-    xbmc.log(message)
+    xbmc.log(str(message))
 
 
 def _log(message):
@@ -61,6 +49,42 @@ def _log(message):
     if module_log_enabled:
         # message = message.encode('utf-8')
         xbmc.log("addontools."+message)
+
+
+def find_multiple_matches(text, pattern):
+    """
+    Parse string and extracts multiple matches using regular expressions
+
+    :param text:
+    :param pattern:
+    :return:
+    """
+
+    _log("find_multiple_matches pattern=" + pattern)
+
+    matches = re.findall(pattern, text, re.DOTALL)
+
+    return matches
+
+
+def find_single_match(text, pattern):
+    """
+    Parse string and extracts first match as a string
+
+    :param text:
+    :param pattern:
+    :return:
+    """
+
+    _log("find_single_match pattern=" + pattern)
+
+    try:
+        matches = re.findall(pattern, text, flags=re.DOTALL)
+        result = matches[0]
+    except:
+        result = ""
+
+    return result
 
 
 def clear_cache():
@@ -326,7 +350,7 @@ def redirect_to_kodi_main():
     :return:
     """
 
-    xbmc.executebuiltin('Container.Update(path,replace)')
+    xbmc.executebuiltin('ActivateWindow(home)')
 
 
 def redirect_to_addon_main():
@@ -390,3 +414,17 @@ def selector(option_list, title="Select one"):
     selection = dia.select(title, option_list)
 
     return selection
+
+"""
+Identification
+"""
+f = open(os.path.join(os.path.dirname(__file__), "..", "addon.xml"))
+data = f.read()
+f.close()
+
+addon_id = find_single_match(data, 'id="([^"]+)"')
+if addon_id == "":
+    addon_id = find_single_match(data, "id='([^']+)'")
+
+__settings__ = xbmcaddon.Addon(id=addon_id)
+__language__ = __settings__.getLocalizedString

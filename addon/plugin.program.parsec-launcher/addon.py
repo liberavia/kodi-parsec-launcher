@@ -42,6 +42,7 @@ LOGO_SERVER_CONNECT = DEFAULT_LOGO
 # Globals
 addon = xbmcaddon.Addon(id='plugin.program.parsec-launcher')
 current_computer = False
+parsec_session_id = False
 
 
 def run():
@@ -96,10 +97,13 @@ def main_list(params):
     :return:
     """
 
+    global current_computer
+    global parsec_session_id
+
     addonutils.clear_cache()
 
     user_credentials_available()
-    check_credentials()
+    parsec_session_id = check_credentials()
 
     computers = parsec.get_computers()
     user = parsec.get_user_info()
@@ -166,7 +170,7 @@ def check_credentials():
     """
 
     try:
-        get_parsec_session_id()
+        session_id = parsec.get_parsec_session_id()
     except:
         answer = xbmcgui.Dialog().yesno(
             addonlang.LANG_PARSEC,
@@ -178,6 +182,8 @@ def check_credentials():
             addonutils.redirect_to_addon_main()
         else:
             addonutils.redirect_to_kodi_main()
+
+    return session_id
 
 
 def get_computer_context_menu(computer, numberselect):
@@ -239,8 +245,8 @@ def connect_to_computer(params):
     current_computer = json.loads(computer_json)
     numberselect = params.get('numberselect')
 
-    instance_running = get_is_instance_running(current_computer)
-    instance_off = get_is_instance_off(current_computer)
+    instance_running = parsec.get_is_instance_running(current_computer)
+    instance_off = parsec.get_is_instance_off(current_computer)
 
     start_command = ADDON_BIN_PATH + "/xstart.sh "
 
@@ -358,7 +364,7 @@ def switch_computer_on(params):
     parsec_session_id = params.get('session_id')
     current_computer = json.loads(computer_json)
     computer_id = current_computer['lease']
-    switch_computer_state('on', computer_id)
+    parsec.switch_computer_state('on', computer_id)
 
     addonutils.trigger_notification(
         addonlang.LANG_MESSAGE_COMPUTER_SWITCHED_ON
@@ -382,7 +388,7 @@ def switch_computer_off(params):
     parsec_session_id = params.get('session_id')
     current_computer = json.loads(computer_json)
     computer_id = current_computer['lease']
-    switch_computer_state('off', computer_id)
+    parsec.switch_computer_state('off', computer_id)
 
     addonutils.trigger_notification(
         addonlang.LANG_MESSAGE_COMPUTER_SWITCHED_OFF

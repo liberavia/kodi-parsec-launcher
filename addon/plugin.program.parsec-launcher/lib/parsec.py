@@ -18,13 +18,45 @@ import addonutils
 
 
 # Constants
-MAX_BACKGROUND_REPEATS=30 # which is 5 min waiting
+MAX_BACKGROUND_REPEATS=30  # which is 5 min waiting
+
+# API URLs
+"""
+PUT with id of server in url 
+and session in header CHANGES values
+
+params known:
+server_name = "Wolkenmaschine"
+shutdown_policy = 30m => possible values 5m, 10m, 20m, 1h
+
+DELETE Request with id of server in url and
+session in header DELETES machine
+"""
+API_SERVERS_BASE_URL = "https://parsecgaming.com/v1/servers/"
+
 API_BASEURL = "https://parsecgaming.com/v1/"
 API_AUTHURL = API_BASEURL + "auth"
 API_LIST_COMPUTERS = API_BASEURL + "server-list?include_managed=true"
 API_USER_INFO = API_BASEURL + "me"
 API_SWITCH_COMPUTER_ON = API_BASEURL + "activate-lease"
 API_SWITCH_COMPUTER_OFF = API_BASEURL + "deactivate-lease"
+API_ADD_PLAY_TIME = API_BASEURL + "charges"  # post with id of plan
+API_GET_PLANS = API_BASEURL + "plans"  # returns list of possible plans
+"""
+Renting a machine from parsec is done by simply POST the following example
+params with session_id in header
+
+machine_type: P5000
+region: Europe (AMS1)
+storage_size: 250
+
+Available option combos can be fetched from
+API_GET_BUILD_COMPUTER_OPTIONS
+"""
+API_GET_BUILD_COMPUTER_OPTIONS = API_BASEURL + "providers"  # returns detailed options for creating machine
+API_CREATE_MACHINE = API_BASEURL + "lease"
+
+
 API_USER_AGENT = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:62.0) Gecko/20100101 Firefox/62.0'
 
 # Globals
@@ -80,6 +112,7 @@ def get_computers():
     session_id = get_parsec_session_id()
     addonutils.log("Received parsec sessionid for getting list of computers:" + session_id)
     computers = get_parsec_request_result(session_id, API_LIST_COMPUTERS)
+    addonutils.log('Parsec List of computers as json: ' + str(computers))
 
     return computers
 
@@ -135,9 +168,13 @@ def get_parsec_session_id():
                   'password': parsec_passwd,
                   'expiration_type': 'short'}
         headers = {'User-Agent': API_USER_AGENT}
+        addonutils.log("Parsec: headers:" + str(headers))
 
         data = urllib.urlencode(values)
+
         req = urllib2.Request(API_AUTHURL, data, headers)
+        addonutils.log("Parsec session url:" + API_AUTHURL)
+
         response = urllib2.urlopen(req)
 
         data = json.load(response)
@@ -167,7 +204,7 @@ def switch_computer_state(target_state, computer_id):
     }
     headers = {
         'User-Agent': API_USER_AGENT,
-        'x-parsec-session-id': parsec_session_id
+        'x-parsec-session-id': get_parsec_session_id()
     }
 
     data = urllib.urlencode(values)

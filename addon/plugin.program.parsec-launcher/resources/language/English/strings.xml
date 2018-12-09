@@ -29,7 +29,8 @@
     <string id="30036">$</string>
     <string id="30037">[B][COLOR blue]Computer-Details:[/COLOR][/B]</string>
     <string id="30038">[B][COLOR blue]User-Details:[/COLOR][/B]</string>
-    <string id="30039">[B][COLOR green]Username[/COLOR][/B]</string>
+    <string id="30039">[B][COLOR green]Username[/COLOR][/B]</string>#
+    <string id="30040">Installing</string>
 
     <!-- Message strings -->
     <string id="30200">This computer is busy</string>

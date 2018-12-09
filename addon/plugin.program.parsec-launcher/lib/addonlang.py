@@ -34,6 +34,7 @@ LANG_DOLLAR = translate_code(30036)
 LANG_COMPUTER_INFO = translate_code(30037)
 LANG_USER_INFO = translate_code(30038)
 LANG_USERNAME = translate_code(30039)
+LANG_INSTALL = translate_code(30040)
 
 LANG_MESSAGE_COMPUTER_PENDING = translate_code(30200)
 LANG_MESSAGE_COMPUTER_SWITCHED_ON = translate_code(30201)

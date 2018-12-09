@@ -1,7 +1,6 @@
 import os
 import sys
 import stat
-import shutil
 import time
 import threading
 import platform
@@ -20,15 +19,15 @@ ADDON_LOCK_FILE = '/tmp/kodi_parsec_launcher.lock'
 ADDON_INSTALLED_TMP_FILE = '/tmp/installed_packages'
 
 MANDATORY_PACKAGES = (
+    'parsec',
     'lxde-core',
     'xserver-xorg',
     'xinit',
     'fbi',
     'libinput-dev',
-    'expect',
     'openbox',
-    'python-pip',
-    'parsec'
+    'expect',
+    'python-pip'
 )
 
 PIP_PACKAGES = (
@@ -57,7 +56,7 @@ def complete_install_check():
     )
     if answer:
         start_background_update()
-        addonutils.return_to_kodi_main()
+        addonutils.redirect_to_kodi_main()
 
 
 def start_background_update():
@@ -72,7 +71,7 @@ def start_background_update():
     background_dialog.update(5, addonlang.LANG_PARSEC, addonlang.LANG_MESSAGE_INSTALL_MISSING)
     background_process = threading.Thread(
         target=install_missing_packages,
-        args=(background_dialog,)
+        args=(background_dialog, 5)
     )
     background_process.start()
 
@@ -111,14 +110,16 @@ def install_missing_packages(background_dialog, current_progress):
 
     :return:
     """
-    lock_addon(True)
+    # addonutils.lock_addon(True)
 
     progress_max = 90
 
     remaining_progress = progress_max - current_progress
 
     missing_packages = get_missing_packages()
+    addonutils.log('Parsec: Missing packages: ' + ', '.join(missing_packages))
     progress_step = float(remaining_progress / len(missing_packages))
+    addonutils.log('Parsec: Progress step: ' + str(progress_step))
 
     for missing_package in missing_packages:
         current_progress = get_next_progress(
@@ -126,17 +127,22 @@ def install_missing_packages(background_dialog, current_progress):
             progress_step,
             progress_max
         )
+        addonutils.log('Parsec: Current progress: ' + str(current_progress))
 
-        install_package_message = LANG_INSTALL + " " + missing_package
+        install_package_message = str(addonlang.LANG_INSTALL) + " " + str(missing_package)
+        addonutils.log('Parsec: Display install message: ' + install_package_message)
 
         background_dialog.update(
-            current_progress,
+            int(current_progress),
             addonlang.LANG_PARSEC,
             install_package_message
         )
         install_package(missing_package)
 
-    lock_addon(False)
+    background_dialog.close()
+    os.remove(ADDON_INSTALLED_TMP_FILE)
+    # addonutils.lock_addon(False)
+    pass
 
 
 def get_next_progress(progress_current, progress_step, progress_max):
@@ -168,10 +174,12 @@ def install_package(package_name):
         install_parsec()
         return
 
-    command = 'sudo apt-get -y install '
+    command_options = ' -q -y '
+    command = 'sudo DEBIAN_FRONTEND=noninteractive apt-get install' + command_options
     install_command = command + package_name
 
-    os.popen(install_command)
+    addonutils.log('Parsec performing install command: ' + install_command)
+    os.system(install_command)
 
 
 def install_parsec():
@@ -182,9 +190,11 @@ def install_parsec():
     """
 
     download_command = 'wget -q https://s3.amazonaws.com/parsec-build/package/parsec-rpi.deb -P /tmp/ 2>&1'
-    os.popen(download_command)
+    addonutils.log('Parsec: Downloading parsec with: ' + download_command)
+    os.system(download_command)
     install_command = 'sudo dpkg -i /tmp/parsec-rpi.deb'
-    os.popen(install_command)
+    addonutils.log('Parsec: Installing parsec with: ' + install_command)
+    os.system(install_command)
 
 
 def get_missing_packages():
