@@ -31,6 +31,10 @@
     <string id="30038">[B][COLOR blue]Benutzer-Infos:[/COLOR][/B]</string>
     <string id="30039">[B][COLOR green]Benutzername[/COLOR][/B]</string>
     <string id="30040">Installiere</string>
+    <string id="30041">[COLOR red]Löschen[/COLOR]</string>
+    <string id="30042">[COLOR green]Neuen Computer mieten[/COLOR]</string>
+    <string id="30043">[COLOR green]Guthaben aufladen[/COLOR]</string>
+    <string id="30043">[COLOR green]Preis je Stunde[/COLOR]</string>
 
     <!-- Message strings -->
     <string id="30200">Der Computer ist beschäftigt</string>
@@ -46,9 +50,12 @@
     <string id="30212">Statusüberwachung abgebrochen</string>
     <string id="30213">Wartungsarbeiten. Bitte warten...</string>
     <string id="30214">Das Addon ist nicht kompatibel mit Ihrer Betriebssystemplattform</string>
+    <string id="30215">Computer wird [COLOR red]gelöscht[/COLOR]</string>
 
     <!-- Question strings -->
     <string id="30500">Wollen Sie die Zugangsdaten jetzt bearbeiten?</string>
     <string id="30501">Wollen Sie ihn einschalten?</string>
     <string id="30502">Wollen Sie die fehlenden Systempakete jetzt installieren?</string>
+    <string id="30503">Sind Sie sicher, dass Sie den Computer löschen wollen?</string>
+    <string id="30504">Wollen Sie ihn ausschalten?</string>
 </strings>

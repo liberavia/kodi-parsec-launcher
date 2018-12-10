@@ -32,9 +32,8 @@ shutdown_policy = 30m => possible values 5m, 10m, 20m, 1h
 DELETE Request with id of server in url and
 session in header DELETES machine
 """
-API_SERVERS_BASE_URL = "https://parsecgaming.com/v1/servers/"
-
 API_BASEURL = "https://parsecgaming.com/v1/"
+API_SERVERS_BASE_URL = "https://parsecgaming.com/v1/servers/"
 API_AUTHURL = API_BASEURL + "auth"
 API_LIST_COMPUTERS = API_BASEURL + "server-list?include_managed=true"
 API_USER_INFO = API_BASEURL + "me"
@@ -131,6 +130,36 @@ def get_user_info():
     return user
 
 
+def get_plans():
+    """
+    Returns a list of possible plans for creating
+    a new machine
+
+    :return json:
+    """
+
+    session_id = get_parsec_session_id()
+    addonutils.log("Received parsec sessionid for fetching user:" + session_id)
+    plans = get_parsec_request_result(session_id, API_GET_PLANS)
+
+    return plans
+
+
+def get_providers():
+    """
+    Returns a list with all possible options for renting
+    a cloud machine
+
+    :return json:
+    """
+
+    session_id = get_parsec_session_id()
+    addonutils.log("Received parsec sessionid for fetching user:" + session_id)
+    providers = get_parsec_request_result(session_id, API_GET_BUILD_COMPUTER_OPTIONS)
+
+    return providers
+
+
 def get_parsec_request_result(session_id, url):
     """
     requesting parsec by providing session and url
@@ -183,6 +212,29 @@ def get_parsec_session_id():
     addonutils.log("Received parsec sessionid:" + parsec_session_id)
 
     return parsec_session_id
+
+
+def delete_computer(computer_id):
+    """
+    Deletes computer with given id
+
+    :param: computer_id
+    :return:
+    """
+
+    session_id = get_parsec_session_id()
+
+    header = {
+        'User-Agent': API_USER_AGENT,
+        'x-parsec-session-id': session_id
+    }
+
+    delete_url = API_SERVERS_BASE_URL + str(computer_id)
+
+    response = requests.delete(delete_url, params=values, headers=header)
+    result = response.json()
+
+    return result
 
 
 def switch_computer_state(target_state, computer_id):

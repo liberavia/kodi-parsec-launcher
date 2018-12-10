@@ -31,6 +31,7 @@
     <string id="30038">[B][COLOR blue]User-Details:[/COLOR][/B]</string>
     <string id="30039">[B][COLOR green]Username[/COLOR][/B]</string>#
     <string id="30040">Installing</string>
+    <string id="30041">[COLOR red]Delete[/COLOR]</string>
 
     <!-- Message strings -->
     <string id="30200">This computer is busy</string>
@@ -46,9 +47,12 @@
     <string id="30212">Status checking aborted</string>
     <string id="30213">Maintenance. Please wait...</string>
     <string id="30214">The addon is incompatible with your platform</string>
+    <string id="30215">Computer will be [COLOR red]deleted[/COLOR]</string>
 
     <!-- Question string -->
     <string id="30500">Do you want to setup credentials now?</string>
     <string id="30501">Do you want to switch it on?</string>
     <string id="30502">Do you want to install missing system packages now?</string>
+    <string id="30503">Are you sure you want to delete this computer?</string>
+    <string id="30504">Do you want to switch it off?</string>
 </strings>

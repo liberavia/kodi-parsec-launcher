@@ -141,7 +141,22 @@ def install_missing_packages(background_dialog, current_progress):
 
     background_dialog.close()
     os.remove(ADDON_INSTALLED_TMP_FILE)
+    disable_lightdm()
     # addonutils.lock_addon(False)
+    pass
+
+
+def disable_lightdm():
+    """
+    Diables lightdm
+
+    :return:
+    """
+
+    command = 'sudo systemctl disable lightdm'
+
+    addonutils.log('Disabling lightdm with command: ' + command)
+    os.system(command)
     pass
 
 

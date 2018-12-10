@@ -161,6 +161,7 @@ def add_computer_list_item(action="", title="", thumbnail="", fanart="", session
     :param context:
     :return:
     """
+
     listitem = xbmcgui.ListItem(title, iconImage="DefaultVideo.png", thumbnailImage=thumbnail)
 
     if info_labels is None:
@@ -195,6 +196,137 @@ def add_computer_list_item(action="", title="", thumbnail="", fanart="", session
         numberselect,
     )
     xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=itemurl, listitem=listitem, isFolder=folder)
+
+
+def add_action_list_item(action, title, session_id, user, thumbnail, fanart, folder):
+    """
+    Adds a general action list item
+
+    :param action:
+    :param title:
+    :param session_id:
+    :param user:
+    :param thumbnail:
+    :param fanart:
+    :param folder:
+    :return:
+    """
+
+    listitem = xbmcgui.ListItem(title, iconImage="DefaultVideo.png", thumbnailImage=thumbnail)
+
+    if info_labels is None:
+        info_labels = {"Title": title, "Plot": ''}
+
+    listitem.setInfo("video", info_labels)
+
+    if fanart != "":
+        listitem.setProperty('fanart_image', fanart)
+        xbmcplugin.setPluginFanart(int(sys.argv[1]), fanart)
+
+    itemurl = '%s?action=%s&title=%s&session_id=%s&user=%s&thumbnail=%s&fanart=%s' % (
+        sys.argv[0],
+        action,
+        urllib.quote_plus(title),
+        urllib.quote_plus(session_id),
+        urllib.quote_plus(user),
+        urllib.quote_plus(thumbnail),
+        urllib.quote_plus(fanart)
+    )
+    xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=itemurl, listitem=listitem, isFolder=folder)
+    pass
+
+
+def add_provider_list_item(action, session_id, provider, user, thumbnail, fanart, folder, title="", selection="", info=""):
+    """
+    Adds list item of type provider
+
+    :param action:
+    :param title:
+    :param session_id:
+    :param provider:
+    :param user:
+    :param thumbnail:
+    :param fanart:
+    :param folder:
+    :param title:
+    :param selection:
+    :param info:
+    :return:
+    """
+
+    if not title:
+        title = get_provider_title_by_action(action, provider)
+    if not info:
+        info = get_provider_info_by_action(action, provider)
+
+    listitem = xbmcgui.ListItem(title, iconImage="DefaultVideo.png", thumbnailImage=thumbnail)
+
+    info_labels = {"Title": title, "Plot": info}
+
+    listitem.setInfo("video", info_labels)
+
+    if fanart != "":
+        listitem.setProperty('fanart_image', fanart)
+        xbmcplugin.setPluginFanart(int(sys.argv[1]), fanart)
+
+    itemurl = '%s?action=%s&title=%s&session_id=%s&user=%s&thumbnail=%s&fanart=%s&selection=%s&info=%s' % (
+        sys.argv[0],
+        action,
+        urllib.quote_plus(title),
+        urllib.quote_plus(session_id),
+        urllib.quote_plus(provider),
+        urllib.quote_plus(user),
+        urllib.quote_plus(thumbnail),
+        urllib.quote_plus(fanart),
+        urllib.quote_plus(selection)
+    )
+    xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=itemurl, listitem=listitem, isFolder=folder)
+    pass
+
+
+def get_selection_by_action(action, selection):
+    """
+
+    :param action:
+    :param selection:
+    :return:
+    """
+
+    selection = json.loads(selection)
+
+
+    pass
+
+def get_provider_title_by_action(action, provider):
+    """
+    Returns matching title on action
+
+    :param action:
+    :param provider:
+    :return string:
+    """
+
+    switcher = {
+        'rent_new_computer_provider': provider['label'],
+    }
+
+    return switcher.get(action, provider['name'])
+
+
+def get_provider_info_by_action(action, provider):
+    """
+    Returns provider information depending on action
+
+    :param action:
+    :param provider:
+    :return string:
+    """
+
+    switcher = {
+        'rent_new_computer_provider': '',
+    }
+
+    return switcher.get(action, '')
 
 
 def close_item_list():

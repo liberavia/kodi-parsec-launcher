@@ -38,6 +38,7 @@ LOGO_SERVER_ON = DEFAULT_LOGO
 LOGO_SERVER_OFF = DEFAULT_LOGO
 LOGO_SERVER_PENDING = DEFAULT_LOGO
 LOGO_SERVER_CONNECT = DEFAULT_LOGO
+LOGO_NEW_CLOUD_COMPUTER = DEFAULT_LOGO
 
 # Globals
 addon = xbmcaddon.Addon(id='plugin.program.parsec-launcher')
@@ -130,7 +131,134 @@ def main_list(params):
             folder=True,
             context=context
         )
+
+    addonutils.add_action_list_item(
+        action="rent_new_computer",
+        title=LANG_RENT_NEW_COMPUTER,
+        session_id=parsec_session_id,
+        user=user_json,
+        thumbnail=LOGO_NEW_CLOUD_COMPUTER,
+        fanart=DEFAULT_FANART,
+        folder=True
+    )
+
     pass
+
+
+def rent_new_computer(params):
+    """
+    Fetch available rent provider in first step and display them to user
+
+    :param params:
+    :return:
+    """
+
+    global parsec_session_id
+
+    providers = parsec.get_providers()
+    available_providers = json.loads(providers)
+
+    for provider in available_providers:
+        thumbnail_provider = get_provider_thumbnail(provider)
+        fanart_provider = get_provider_fanart(provider)
+        selection = []
+        selection['provider'] = provider['label']
+        addonutils.add_provider_list_item(
+            action="rent_new_computer_provider_selected",
+            session_id=parsec_session_id,
+            provider=json.dumps(provider),
+            user=user_json,
+            thumbnail=thumbnail_provider,
+            fanart=fanart_provider,
+            folder=True,
+            title="",
+            selection=selection
+        )
+    pass
+
+
+def rent_new_computer_provider_selected(params):
+    """
+    Ask for region which the machine shall be created
+
+    :param params:
+    :return:
+    """
+
+    provider = json.loads(params.get('provider'))
+    regions = provider['regions']
+    thumbnail_provider = get_provider_thumbnail(provider)
+    fanart_provider = get_provider_fanart(provider)
+
+    for region_param, region_infos in enumerate(regions):
+        region_label = region_infos['label']
+        selection = json.loads(params.get('selection'))
+        selection['region'] = region_param
+        addonutils.add_provider_list_item(
+            action="rent_new_computer_region_selected",
+            session_id=parsec_session_id,
+            provider=json.dumps(provider),
+            user=user_json,
+            thumbnail=thumbnail_provider,
+            fanart=fanart_provider,
+            folder=True,
+            title=region_label,
+            selection=json.dumps(selection),
+            info=""
+        )
+    pass
+
+
+def rent_new_computer_region_selected(params):
+    """
+    Next choose machine type
+
+    :param params:
+    :return:
+    """
+    provider = json.loads(params.get('provider'))
+    machine_types = provider['machine_types']
+    thumbnail_provider = get_provider_thumbnail(provider)
+    fanart_provider = get_provider_fanart(provider)
+
+
+    for machine_infos in machine_types:
+        selection = json.loads(params.get('selection'))
+        machine_info = get_rent_machine_infos(machine_infos, selection)
+        machine_param = machine_infos['name']
+        selection['machine_type'] = machine_param
+        addonutils.add_provider_list_item(
+            action="rent_new_computer_machine_selected",
+            session_id=parsec_session_id,
+            provider=json.dumps(provider),
+            user=user_json,
+            thumbnail=thumbnail_provider,
+            fanart=fanart_provider,
+            folder=True,
+            title=region_label,
+            selection=json.dumps(selection),
+            info=machine_info
+        )
+
+
+def get_rent_machine_infos(machine_infos, selection):
+    """
+    Returns string with main information about machine
+
+    :param machine_infos:
+    :param selection:
+    :return:
+    """
+
+    selected_region = selection['region']
+    price_selected_region = machine_infos['price_per_hour'][selected_region]
+
+    machine_info = ""
+    machine_info += addonlang.LANG_PRICE_PER_HOUR + ": " + addonlang.LANG_DOLLAR + price_selected_region + "\n"
+    for specs in machine_infos['specs']:
+        machine_info += "[COLOR blue]" + specs['name'] + "[/COLOR]:" + specs['value'] + "\n"
+
+    return machine_info
 
 
 def user_credentials_available():
@@ -223,11 +351,65 @@ def get_computer_context_menu(computer, numberselect):
         numberselect,
     )
 
+    delete_action ='delete_computer'
+    context_label_delete_computer = addonlang.LANG_DELETE_MACHINE
+    context_url_delete_computer = '%s?action=%s&title=%s&session_id=%s&computer=%s&thumbnail=%s&fanart=%s&numberselect=%s' % (
+        sys.argv[0],
+        delete_action,
+        urllib.quote_plus(context_label_delete_computer),
+        urllib.quote_plus(session_id),
+        urllib.quote_plus(json.dumps(computer)),
+        urllib.quote_plus(DEFAULT_LOGO),
+        urllib.quote_plus(DEFAULT_FANART),
+        numberselect,
+    )
+
     context_menu = []
     context_menu.append({'label': context_label_switch_computer, 'url': context_url_switch_computer})
     context_menu.append({'label': context_label_connect_computer, 'url': context_url_connect_computer})
+    context_menu.append({'label': context_label_delete_computer, 'url': context_url_delete_computer})
 
     return context_menu
+
+
+def delete_computer(params):
+    """
+
+    :param params:
+    :return:
+    """
+
+    computer_json = params.get('computer')
+    computer = json.loads(computer_json)
+    computer_id = computer['id']
+    instance_running = parsec.get_is_instance_running(computer)
+    instance_off = parsec.get_is_instance_off(computer)
+
+    if instance_running:
+        answer = xbmcgui.Dialog().yesno(
+            addonlang.LANG_PARSEC,
+            addonlang.LANG_MESSAGE_COMPUTER_ON,
+            addonlang.LANG_QUESTION_SWITCH_OFF
+        )
+        if answer is True:
+            switch_computer_off(params)
+            addonutils.redirect_to_kodi_main()
+    elif instance_off:
+        answer = xbmcgui.Dialog().yesno(
+            addonlang.LANG_PARSEC,
+            addonlang.LANG_MESSAGE_DELETE,
+            addonlang.LANG_QUESTION_DELETE
+        )
+        if answer is True:
+            parsec.delete_computer(computer_id)
+            addonutils.redirect_to_kodi_main()
+    else:
+        xbmcgui.Dialog().ok(
+            addonlang.LANG_PARSEC,
+            addonlang.LANG_MESSAGE_COMPUTER_PENDING
+        )
+        addonutils.redirect_to_addon_main()
+    pass
 
 
 def connect_to_computer(params):
@@ -264,7 +446,7 @@ def connect_to_computer(params):
         answer = xbmcgui.Dialog().yesno(
             addonlang.LANG_PARSEC,
             addonlang.LANG_MESSAGE_COMPUTER_OFF,
-            addonlang.LANG_QUESTION_QUESTION_SWITCH_ON
+            addonlang.LANG_QUESTION_SWITCH_ON
         )
         if answer == True:
             switch_computer_on(params)
