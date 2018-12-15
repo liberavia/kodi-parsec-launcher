@@ -41,6 +41,7 @@ API_SWITCH_COMPUTER_ON = API_BASEURL + "activate-lease"
 API_SWITCH_COMPUTER_OFF = API_BASEURL + "deactivate-lease"
 API_ADD_PLAY_TIME = API_BASEURL + "charges"  # post with id of plan
 API_GET_PLANS = API_BASEURL + "plans"  # returns list of possible plans
+API_GET_CARDS = API_BASEURL + "billing/cards" #  returns list of added cards
 """
 Renting a machine from parsec is done by simply POST the following example
 params with session_id in header
@@ -101,6 +102,30 @@ def get_computer_info(computer_json, user_json):
     return computer_info
 
 
+def add_playtime(planid):
+    """
+    Adds playtime (money) to account. Needs ID of plan
+
+    :param planid:
+    :return:
+    """
+
+    session_id = get_parsec_session_id()
+    addonutils.log("Received parsec sessionid for fetching user:" + session_id)
+
+    values = {
+        'id': planid
+    }
+    header = {
+        'User-Agent': API_USER_AGENT,
+        'x-parsec-session-id': session_id
+    }
+
+    response = requests.post(API_ADD_PLAY_TIME, params=values, headers=header)
+    result = response.json()
+
+    return result
+
 def get_computers():
     """
     Returns list of available computers and their metadata
@@ -144,6 +169,21 @@ def get_plans():
 
     return plans
 
+
+def get_cards():
+    """
+    Returns a list of added cards
+
+    :return json:
+    ;todo currently adding cards is foreseen via the webinterface
+    ;todo BUT should generally also be possible to implement IMHO
+    """
+
+    session_id = get_parsec_session_id()
+    addonutils.log("Received parsec sessionid for fetching user:" + session_id)
+    cards = get_parsec_request_result(session_id, API_GET_CARDS)
+
+    return cards
 
 def get_providers():
     """

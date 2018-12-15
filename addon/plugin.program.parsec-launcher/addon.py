@@ -39,6 +39,11 @@ LOGO_SERVER_OFF = DEFAULT_LOGO
 LOGO_SERVER_PENDING = DEFAULT_LOGO
 LOGO_SERVER_CONNECT = DEFAULT_LOGO
 LOGO_NEW_CLOUD_COMPUTER = DEFAULT_LOGO
+LOGO_PROVIDER_AMAZON = DEFAULT_LOGO
+LOGO_PROVIDER_PAPERSPACE = DEFAULT_LOGO
+LOGO_CHARGE_ACCOUNT = DEFAULT_LOGO
+FANART_PROVIDER_AMAZON = DEFAULT_FANART
+FANART_PROVIDER_PAPERSPACE = DEFAULT_FANART
 
 # Globals
 addon = xbmcaddon.Addon(id='plugin.program.parsec-launcher')
@@ -132,12 +137,26 @@ def main_list(params):
             context=context
         )
 
+    has_payment = get_user_has_payment()
+
+    if not has_payment:
+        return
+
     addonutils.add_action_list_item(
-        action="rent_new_computer",
-        title=LANG_RENT_NEW_COMPUTER,
+        action="rent_new_computer_select_provider",
+        title=addonlang.LANG_RENT_NEW_COMPUTER,
         session_id=parsec_session_id,
         user=user_json,
         thumbnail=LOGO_NEW_CLOUD_COMPUTER,
+        fanart=DEFAULT_FANART,
+        folder=True
+    )
+    addonutils.add_action_list_item(
+        action="charge_account_selection",
+        title=addonlang.LANG_CHARGE_ACCOUNT,
+        session_id=parsec_session_id,
+        user=user_json,
+        thumbnail=LOGO_CHARGE_ACCOUNT,
         fanart=DEFAULT_FANART,
         folder=True
     )
@@ -145,7 +164,83 @@ def main_list(params):
     pass
 
 
-def rent_new_computer(params):
+def get_user_has_payment():
+    """
+    Checks if given user_json has a payment set
+
+    :return:
+    """
+
+    cards_json = parsec.get_cards()
+    cards = json.loads(cards_json)
+
+    has_payment = bool(len(cards) > 0)
+
+    return has_payment
+
+
+def charge_account_selection(params):
+    """
+    Get list of available plans, so user can select between them
+
+    :param params:
+    :return:
+    """
+
+    global parsec_session_id
+
+    plans_json = parsec.get_plans()
+    plans = json.loads(plans_json)
+
+    for plan in plans:
+        addonutils.add_action_list_item(
+            action="charge_account",
+            title=plan['name'],
+            description=plan['description'],
+            session_id=parsec_session_id,
+            user=json.dumps(plan),
+            thumbnail=LOGO_CHARGE_ACCOUNT,
+            fanart=DEFAULT_FANART,
+            folder=False
+        )
+
+
+def charge_account(params):
+    """
+    Summarize planned action an let user confirm
+
+    :param params:
+    :return:
+    ;todo handling of response
+    """
+
+    plan = json.loads(params.get('user'))
+    plan_amount = int(plan['goal_amount']) / 100
+
+    parts = [
+        addonlang.LANG_CHARGE_WITH,
+        ": [COLOR lightgreen]",
+        addonlang.LANG_DOLLAR,
+        str(plan_amount),
+        "[/COLOR]\n",
+        addonlang.LANG_QUESTION_CHARGE_AMOUNT
+    ]
+
+    label = "".join(parts)
+
+    answer = xbmcgui.Dialog().yesno(
+        addonlang.LANG_PARSEC,
+        addonlang.LANG_CHARGE_ACCOUNT,
+        label
+    )
+    if answer == True:
+        planid = plan['id']
+        response = parsec.add_playtime(planid)
+
+    redirect_to_main_list()
+
+
+def rent_new_computer_select_provider(params):
     """
     Fetch available rent provider in first step and display them to user
 
@@ -157,14 +252,16 @@ def rent_new_computer(params):
 
     providers = parsec.get_providers()
     available_providers = json.loads(providers)
+    user_json = parsec.get_user_info()
 
     for provider in available_providers:
         thumbnail_provider = get_provider_thumbnail(provider)
         fanart_provider = get_provider_fanart(provider)
         selection = []
         selection['provider'] = provider['label']
+
         addonutils.add_provider_list_item(
-            action="rent_new_computer_provider_selected",
+            action="rent_new_computer_select_region",
             session_id=parsec_session_id,
             provider=json.dumps(provider),
             user=user_json,
@@ -177,7 +274,7 @@ def rent_new_computer(params):
     pass
 
 
-def rent_new_computer_provider_selected(params):
+def rent_new_computer_select_region(params):
     """
     Ask for region which the machine shall be created
 
@@ -194,8 +291,9 @@ def rent_new_computer_provider_selected(params):
         region_label = region_infos['label']
         selection = json.loads(params.get('selection'))
         selection['region'] = region_param
+
         addonutils.add_provider_list_item(
-            action="rent_new_computer_region_selected",
+            action="rent_new_computer_select_machine",
             session_id=parsec_session_id,
             provider=json.dumps(provider),
             user=user_json,
@@ -209,36 +307,186 @@ def rent_new_computer_provider_selected(params):
     pass
 
 
-def rent_new_computer_region_selected(params):
+def rent_new_computer_select_machine(params):
     """
     Next choose machine type
 
     :param params:
     :return:
     """
+
+    user_json = params.get('user')
     provider = json.loads(params.get('provider'))
     machine_types = provider['machine_types']
     thumbnail_provider = get_provider_thumbnail(provider)
     fanart_provider = get_provider_fanart(provider)
-
 
     for machine_infos in machine_types:
         selection = json.loads(params.get('selection'))
         machine_info = get_rent_machine_infos(machine_infos, selection)
         machine_param = machine_infos['name']
         selection['machine_type'] = machine_param
+        machine_title = machine_infos['label']
+
         addonutils.add_provider_list_item(
-            action="rent_new_computer_machine_selected",
+            action="rent_new_computer_select_space",
             session_id=parsec_session_id,
             provider=json.dumps(provider),
             user=user_json,
             thumbnail=thumbnail_provider,
             fanart=fanart_provider,
             folder=True,
-            title=region_label,
+            title=machine_title,
             selection=json.dumps(selection),
             info=machine_info
         )
+
+
+def rent_new_computer_select_space(params):
+    """
+    Next choose diskspace for machine
+
+    :param params:
+    :return:
+    """
+
+    user_json = params.get('user')
+    machine_info = params.get('info')
+    provider = json.loads(params.get('provider'))
+    storage_types = provider['storage_sizes']
+    thumbnail_provider = get_provider_thumbnail(provider)
+    fanart_provider = get_provider_fanart(provider)
+
+    for storage_infos in storage_types:
+        selection = json.loads(params.get('selection'))
+        storage_param = storage_infos['size']
+        selection['storage_size'] = storage_param
+        storage_title = str(storage_infos['size']) + " " + storage_infos['label']
+
+        addonutils.add_provider_list_item(
+            action="rent_new_computer_summary_confirmation",
+            session_id=parsec_session_id,
+            provider=json.dumps(provider),
+            user=user_json,
+            thumbnail=thumbnail_provider,
+            fanart=fanart_provider,
+            folder=True,
+            title=storage_title,
+            selection=json.dumps(selection),
+            info=machine_info
+        )
+
+
+def rent_new_computer_summary_confirmation(params):
+    """
+    Finally list selections to user, offer possibility to
+    jump into each step again or create machine with given params
+
+    :param params:
+    :return:
+    """
+
+    user_json = params.get('user')
+    machine_info = params.get('info')
+    selected_params = json.loads(params.get('selection'))
+    provider = json.loads(params.get('provider'))
+    thumbnail_provider = get_provider_thumbnail(provider)
+    fanart_provider = get_provider_fanart(provider)
+
+    for param, value in enumerate(selected_params):
+        label = get_label_for_param(param, value)
+        action = get_returnaction_for_param(param)
+
+        addonutils.add_provider_list_item(
+            action=action,
+            session_id=parsec_session_id,
+            provider=json.dumps(provider),
+            user=user_json,
+            thumbnail=thumbnail_provider,
+            fanart=fanart_provider,
+            folder=True,
+            title=label,
+            selection=json.dumps(selected_params),
+            info=machine_info
+        )
+
+
+def get_returnaction_for_param(param):
+    """
+    Delivers action for returning to current selected
+    param selection
+
+    :param param:
+    :return:
+    """
+
+    switcher = {
+        'provider': 'rent_new_computer_select_provider',
+        'region': 'rent_new_computer_select_region',
+        'machine_type': 'rent_new_computer_select_machine',
+        'storage_size': 'rent_new_computer_select_space'
+    }
+
+    return switcher.get(param, 'rent_new_computer_select_provider')
+
+
+def get_label_for_param(param, value):
+    """
+    Returns matching label for selected param
+
+    :param param:
+    :param value:
+    :return:
+    """
+
+
+    switcher = {
+        'provider': param,
+        'region': addonlang.LANG_REGION,
+        'machine_type': addonlang.LANG_MACHINE_TYPE,
+        'storage_size': addonlang.LANG_STORAGE_SIZE
+    }
+
+    label = switcher.get(str(param), param)
+    label = str(label) + ': ' + str(value)
+
+    return label
+
+
+def get_provider_thumbnail(provider):
+    """
+    Returns matching providerlogo or default
+
+    :param provider:
+    :return:
+    """
+
+    providername = provider['name']
+
+    switcher = {
+        'aws': LOGO_PROVIDER_AMAZON,
+        'paperspace': LOGO_PROVIDER_PAPERSPACE
+    }
+
+    return switcher.get(providername, DEFAULT_LOGO)
+
+
+def get_provider_fanart(provider):
+    """
+    Returns matching provider fanart or default
+
+    :param provider:
+    :return:
+    """
+
+    providername = provider['name']
+
+    switcher = {
+        'aws': FANART_PROVIDER_AMAZON,
+        'paperspace': FANART_PROVIDER_PAPERSPACE
+    }
+
+    return switcher.get(providername, DEFAULT_FANART)
 
 
 def get_rent_machine_infos(machine_infos, selection):

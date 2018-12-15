@@ -198,12 +198,13 @@ def add_computer_list_item(action="", title="", thumbnail="", fanart="", session
     xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=itemurl, listitem=listitem, isFolder=folder)
 
 
-def add_action_list_item(action, title, session_id, user, thumbnail, fanart, folder):
+def add_action_list_item(action, title, description, session_id, user, thumbnail, fanart, folder):
     """
     Adds a general action list item
 
     :param action:
     :param title:
+    :param description:
     :param session_id:
     :param user:
     :param thumbnail:
@@ -214,8 +215,7 @@ def add_action_list_item(action, title, session_id, user, thumbnail, fanart, fol
 
     listitem = xbmcgui.ListItem(title, iconImage="DefaultVideo.png", thumbnailImage=thumbnail)
 
-    if info_labels is None:
-        info_labels = {"Title": title, "Plot": ''}
+    info_labels = {"Title": title, "Plot": description}
 
     listitem.setInfo("video", info_labels)
 

@@ -32,6 +32,13 @@
     <string id="30039">[B][COLOR green]Username[/COLOR][/B]</string>#
     <string id="30040">Installing</string>
     <string id="30041">[COLOR red]Delete[/COLOR]</string>
+    <string id="30042">[COLOR green]Rent a new computer[/COLOR]</string>
+    <string id="30043">[COLOR green]Charge account[/COLOR]</string>
+    <string id="30044">[COLOR green]Price per hour[/COLOR]</string>
+    <string id="30045">[COLOR green]Region[/COLOR]</string>
+    <string id="30046">[COLOR green]Harddisk (GB)[/COLOR]</string>
+    <string id="30047">Charge with</string>
+    <string id="30048">Charge account</string>
 
     <!-- Message strings -->
     <string id="30200">This computer is busy</string>
@@ -55,4 +62,5 @@
     <string id="30502">Do you want to install missing system packages now?</string>
     <string id="30503">Are you sure you want to delete this computer?</string>
     <string id="30504">Do you want to switch it off?</string>
+    <string id="30505">Do you want to charge your account with this amount?</string>
 </strings>
